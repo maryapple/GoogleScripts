@@ -17,18 +17,37 @@ function makeRandomNumbers() {
 
 	for (var i = 0; i < 5; i++) {
 		var n = randomNum();
-		if (arr.indexOf(n) == -1) {
-			arr.push(n);
-		} 
-		else {
-			n = randomNum();
+		if ( i <= 2) {
 			if (arr.indexOf(n) == -1) {
 				arr.push(n);
-			}
+			} 
 			else {
 				n = randomNum();
 				if (arr.indexOf(n) == -1) {
 					arr.push(n);
+				}
+				else {
+					n = randomNum();
+					if (arr.indexOf(n) == -1) {
+						arr.push(n);
+					}
+				}
+			}
+		}
+		else {
+			if (arr.indexOf(n * 2) == -1) {
+				arr.push(n * 2);
+			} 
+			else {
+				n = randomNum();
+				if (arr.indexOf(n * 2) == -1) {
+					arr.push(n * 2);
+				}
+				else {
+					n = randomNum();
+					if (arr.indexOf(n * 2) == -1) {
+						arr.push(n * 2);
+					}
 				}
 			}
 		}
@@ -36,19 +55,22 @@ function makeRandomNumbers() {
 	return arr;
 }
 
-// Generates a number between 1 and 10
+// Generates a number between 2 and 12
 function randomNum() {
-	return (Math.round(Math.random()*10) + 1);
+	return (Math.round(Math.random() * 10) + 2);
 }
 
 function selectFieldsOfQuestion(index, amountOfAnswers) {
 	var question = questionSheet.getRange('B' + index).getValue();
+	var typeOfQuestion = questionSheet.getRange('D' + index).getValue();
+	// Logger.log(typeOfQuestion); ok
 	var answers = [];
 	for (var i = 0; i < amountOfAnswers; i++) {
 		answers[i] = questionSheet.getRange(index, 7 + i).getValue();
 	}
 	var obj = {
 		question: question,
+		type: typeOfQuestion,
 		answers: answers
 	};
 	return obj;
@@ -73,6 +95,7 @@ function getDataForForm() {
 // Create unique form for one person
 function makeForm() {
 	var dataset = getDataForForm();
+	Logger.log(dataset);
 
 	var studentEmail = 'marrryapple@gmail.com';
 
@@ -89,8 +112,21 @@ function makeForm() {
     //form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
 
     for (var i = 0; i < 5; i++) {
-    	form.addCheckboxItem()
-    	.setTitle(dataset[i].question)
-    	.setChoiceValues(dataset[i].answers);
+    	//Logger.log(dataset[i].typeOfQuestion); undefined
+    	if (dataset[i].type == "много") {
+    		form.addMultipleChoiceItem()
+    		//form.addCheckboxItem()
+	    	.setTitle(dataset[i].question)
+	    	.setChoiceValues(dataset[i].answers);
+    	}
+    	else if (dataset[i].type == "один") {
+    		form.addScaleItem()
+    		.setTitle(dataset[i].question)
+	    	.setChoiceValues(dataset[i].answers);
+    	}
+    	else if (dataset[i].type == "строка") {
+    		form.addParagraphTextItem()
+    		.setTitle(dataset[i].question);
+    	}
     }
 }
