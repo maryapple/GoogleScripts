@@ -86,5 +86,11 @@ function makeForm() {
     form.setDescription('Тест по Алгоритмизации');
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
-    form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
+    //form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
+
+    for (var i = 0; i < 5; i++) {
+    	form.addCheckboxItem()
+    	.setTitle(dataset[i].question)
+    	.setChoiceValues(dataset[i].answers);
+    }
 }
