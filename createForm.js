@@ -1,6 +1,6 @@
 var questionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Вопросы");
-var studentSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Студенты");
-var answerSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ответы из форм");
+/*var studentSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Студенты");
+var answerSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ответы из форм");*/
 
 function countQuestions() {
 	var range = questionSheet.getRange(2, 1, 30).getValues();
@@ -80,11 +80,12 @@ function getDataForForm() {
 	var array = makeRandomNumbers();
 	var ind = 0;
 	var amountOfAnswers = 0;
-	var questionWithAnswers = {};
-	var dataset = [];
+	var questionWithAnswers = {}; // Object hat contains a line with question
+	var dataset = []; // Array of 5 objects
 
 	for (i in array) {
 		ind = array[i];
+		Logger.log("Number: " + ind + "\n");
 		amountOfAnswers = questionSheet.getRange('F' + ind).getValue();
 		questionWithAnswers = selectFieldsOfQuestion(ind, amountOfAnswers);
 		dataset.push(questionWithAnswers);
@@ -95,7 +96,7 @@ function getDataForForm() {
 // Create unique form for one person
 function makeForm() {
 	var dataset = getDataForForm();
-	Logger.log(dataset);
+	Logger.log(dataset[i]);
 
 	var studentEmail = 'marrryapple@gmail.com';
 
@@ -112,20 +113,18 @@ function makeForm() {
     //form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
 
     for (var i = 0; i < 5; i++) {
-    	//Logger.log(dataset[i].typeOfQuestion); undefined
     	if (dataset[i].type == "много") {
-    		form.addMultipleChoiceItem()
-    		//form.addCheckboxItem()
+    		form.addCheckboxItem()
 	    	.setTitle(dataset[i].question)
 	    	.setChoiceValues(dataset[i].answers);
     	}
     	else if (dataset[i].type == "один") {
-    		form.addScaleItem()
+    		form.addMultipleChoiceItem()
     		.setTitle(dataset[i].question)
 	    	.setChoiceValues(dataset[i].answers);
     	}
     	else if (dataset[i].type == "строка") {
-    		form.addParagraphTextItem()
+    		form.addTextItem()
     		.setTitle(dataset[i].question);
     	}
     }
