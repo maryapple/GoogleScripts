@@ -61,7 +61,6 @@ function randomNum() {
 	return (Math.round(Math.random() * 10) + 2);
 }
 
-// 
 function makeObject(index) {
 	var question = questionSheet.getRange('B' + index).getValue();
 	var typeOfQuestion = questionSheet.getRange('D' + index).getValue();
@@ -118,9 +117,12 @@ function makeForm() {
 
     for (var i = 0; i < 5; i++) {
     	var item;
+    	var imgId;
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
-    			var img = DriveApp.getFileById('1LH6zjXNKbfn6DbHacUGkTJLBVPCpxajn');
+    			imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			Logger.log(imgId);
+    			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
     				.setTitle(dataset[i].question);
@@ -134,7 +136,9 @@ function makeForm() {
 		}
     	else if (dataset[i].type == "один") {
     		if (dataset[i].code != "") {
-    			var img = DriveApp.getFileById('1LH6zjXNKbfn6DbHacUGkTJLBVPCpxajn');
+    			imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			Logger.log(imgId);
+    			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
     				.setTitle(dataset[i].question);
@@ -147,8 +151,18 @@ function makeForm() {
     		item.setChoiceValues(dataset[i].answers);
     	}
     	else if (dataset[i].type == "строка") {
-    		form.addTextItem()
-    		.setTitle(dataset[i].question);
+    		if (dataset[i].code != "") {
+    			imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			Logger.log(imgId);
+    			var img = DriveApp.getFileById(imgId);
+    			form.addTextItem()
+    				.setImage(img)
+    				.setTitle(dataset[i].question);
+			}
+			else {
+	    		form.addTextItem()
+	    		.setTitle(dataset[i].question);
+			}
     	}
     }
 }
