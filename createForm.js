@@ -12,6 +12,7 @@ function countQuestions() {
 	return quantityOfQuestions;
 }
 
+// Generates array of values between 2 and 24
 function makeRandomNumbers() {
 	var arr = [];
 
@@ -60,43 +61,46 @@ function randomNum() {
 	return (Math.round(Math.random() * 10) + 2);
 }
 
-function selectFieldsOfQuestion(index, amountOfAnswers) {
+// 
+function makeObject(index) {
 	var question = questionSheet.getRange('B' + index).getValue();
 	var typeOfQuestion = questionSheet.getRange('D' + index).getValue();
-	// Logger.log(typeOfQuestion); ok
+	var hasCode = questionSheet.getRange('C' + index).getValue(); // type is string
+	// hasCode = (questionSheet.getRange('C' + index).getValue() == undefined) ? null : questionSheet.questionSheet.getRange('C' + index).getValue();
+
 	var answers = [];
+	var amountOfAnswers = questionSheet.getRange('F' + index).getValue();
 	for (var i = 0; i < amountOfAnswers; i++) {
 		answers[i] = questionSheet.getRange(index, 7 + i).getValue();
 	}
+
 	var obj = {
 		question: question,
 		type: typeOfQuestion,
+		code: hasCode,
 		answers: answers
 	};
+
 	return obj;
 }
 
-function getDataForForm() {
-	var array = makeRandomNumbers();
-	var ind = 0;
-	var amountOfAnswers = 0;
-	var questionWithAnswers = {}; // Object hat contains a line with question
-	var dataset = []; // Array of 5 objects
+function makeQuestionset() {
+	var array = makeRandomNumbers();  // Array of 5 random values
+	var questionset = {}; // Object hat contains a line with question
+	var dataset = []; // Array of 5 questionets
 
 	for (i in array) {
-		ind = array[i];
-		Logger.log("Number: " + ind + "\n");
-		amountOfAnswers = questionSheet.getRange('F' + ind).getValue();
-		questionWithAnswers = selectFieldsOfQuestion(ind, amountOfAnswers);
-		dataset.push(questionWithAnswers);
+		var ind = array[i];
+		questionset = makeObject(ind);
+		dataset.push(questionset);
 	}
+	// Logger.log(dataset);
 	return dataset;
 }
 
 // Create unique form for one person
 function makeForm() {
-	var dataset = getDataForForm();
-	Logger.log(dataset[i]);
+	var dataset = makeQuestionset();
 
 	var studentEmail = 'marrryapple@gmail.com';
 
@@ -113,15 +117,34 @@ function makeForm() {
     //form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
 
     for (var i = 0; i < 5; i++) {
+    	var item;
     	if (dataset[i].type == "много") {
-    		form.addCheckboxItem()
-	    	.setTitle(dataset[i].question)
-	    	.setChoiceValues(dataset[i].answers);
-    	}
+    		if (dataset[i].code != "") {
+    			var img = DriveApp.getFileById('1LH6zjXNKbfn6DbHacUGkTJLBVPCpxajn');
+    			form.addImageItem()
+    				.setImage(img)
+    				.setTitle(dataset[i].question);
+				item = form.addCheckboxItem();
+	    	}
+	    	else {
+	    		item = form.addCheckboxItem();
+	    		item.setTitle(dataset[i].question);
+	    	}
+	    	item.setChoiceValues(dataset[i].answers);
+		}
     	else if (dataset[i].type == "один") {
-    		form.addMultipleChoiceItem()
-    		.setTitle(dataset[i].question)
-	    	.setChoiceValues(dataset[i].answers);
+    		if (dataset[i].code != "") {
+    			var img = DriveApp.getFileById('1LH6zjXNKbfn6DbHacUGkTJLBVPCpxajn');
+    			form.addImageItem()
+    				.setImage(img)
+    				.setTitle(dataset[i].question);
+				item = form.addMultipleChoiceItem();
+	    	}
+	    	else {
+	    		item = form.addMultipleChoiceItem();
+	    		item.setTitle(dataset[i].question);
+	    	}
+    		item.setChoiceValues(dataset[i].answers);
     	}
     	else if (dataset[i].type == "строка") {
     		form.addTextItem()
