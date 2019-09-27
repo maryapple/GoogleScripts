@@ -123,7 +123,6 @@ function makeForm() {
     	var imgId;
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
-    			// imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
     			imgId = getImageId(dataset[i]);
     			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
@@ -140,7 +139,6 @@ function makeForm() {
 		}
     	else if (dataset[i].type == "один") {
     		if (dataset[i].code != "") {
-    			// imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
     			imgId = getImageId(dataset[i]);
     			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
@@ -157,7 +155,6 @@ function makeForm() {
     	}
     	else if (dataset[i].type == "строка") {
     		if (dataset[i].code != "") {
-    			// imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
     			imgId = getImageId(dataset[i]);
     			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
@@ -172,6 +169,8 @@ function makeForm() {
 			}
     	}
     }
+
+    // Form.submitGrades();
 }
 
 function getImageId(obj) {
@@ -183,4 +182,8 @@ function getImageId(obj) {
 		idLink = idLink.slice((obj.code).indexOf("=") + 1);
 	}
 	return idLink;
+}
+
+function defineCorrectAnswers() {
+	
 }
