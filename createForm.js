@@ -62,11 +62,11 @@ function randomNum() {
 }
 
 function makeObject(index) {
+	var qId = questionSheet.getRange('A' + index).getValue();
 	var question = questionSheet.getRange('B' + index).getValue();
 	var typeOfQuestion = questionSheet.getRange('D' + index).getValue();
 	var hasCode = questionSheet.getRange('C' + index).getValue(); // type is string
-	// hasCode = (questionSheet.getRange('C' + index).getValue() == undefined) ? null : questionSheet.questionSheet.getRange('C' + index).getValue();
-
+	
 	var answers = [];
 	var amountOfAnswers = questionSheet.getRange('F' + index).getValue();
 	for (var i = 0; i < amountOfAnswers; i++) {
@@ -74,6 +74,7 @@ function makeObject(index) {
 	}
 
 	var obj = {
+		id: qId,
 		question: question,
 		type: typeOfQuestion,
 		code: hasCode,
@@ -116,53 +117,70 @@ function makeForm() {
     //form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
 
     for (var i = 0; i < 5; i++) {
+    	Logger.log("Iteration: " + i);
+    	Logger.log(dataset[i].id);
     	var item;
     	var imgId;
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
-    			imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			// imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			imgId = getImageId(dataset[i]);
     			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
-    				.setTitle(dataset[i].question);
+    				.setTitle(i + 1 + ". " + dataset[i].question);
 				item = form.addCheckboxItem();
 	    	}
 	    	else {
 	    		item = form.addCheckboxItem();
-	    		item.setTitle(dataset[i].question);
+	    		item.setTitle(i + 1 + ". " + dataset[i].question);
 	    	}
 	    	item.setChoiceValues(dataset[i].answers);
 		}
     	else if (dataset[i].type == "один") {
     		if (dataset[i].code != "") {
-    			imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			// imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			imgId = getImageId(dataset[i]);
     			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
-    				.setTitle(dataset[i].question);
+    				.setTitle(i + 1 + ". " + dataset[i].question);
 				item = form.addMultipleChoiceItem();
 	    	}
 	    	else {
 	    		item = form.addMultipleChoiceItem();
-	    		item.setTitle(dataset[i].question);
+	    		item.setTitle(i + 1 + ". " + dataset[i].question);
 	    	}
     		item.setChoiceValues(dataset[i].answers);
     	}
     	else if (dataset[i].type == "строка") {
     		if (dataset[i].code != "") {
-    			imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			// imgId = dataset[i].code.slice((dataset[i].code).indexOf("=") + 1);
+    			imgId = getImageId(dataset[i]);
     			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
-    			form.addTextItem()
+    			form.addImageItem()
     				.setImage(img)
-    				.setTitle(dataset[i].question);
+    				.setTitle(i + 1 + ". " + dataset[i].question);
+				item = form.addTextItem();
 			}
 			else {
 	    		form.addTextItem()
-	    		.setTitle(dataset[i].question);
+	    		.setTitle(i + 1 + ". " + dataset[i].question);
 			}
     	}
     }
+}
+
+function getImageId(obj) {
+	var idLink = obj.code;
+	if (idLink.slice(obj.code).indexOf("=") === -1) {
+		idLink = idLink.slice((obj.code).indexOf("/d/") + 3);
+	}
+	else {
+		idLink = idLink.slice((obj.code).indexOf("=") + 1);
+	}
+	return idLink;
 }
