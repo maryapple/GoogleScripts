@@ -1,6 +1,6 @@
-var questionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Вопросы");
-/*var studentSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Студенты");
-var answerSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Ответы из форм");*/
+var currentSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+var questionSheet = currentSpreadsheet.getSheetByName("Вопросы");
+var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 
 function countQuestions() {
 	var range = questionSheet.getRange(2, 1, 30).getValues();
@@ -73,12 +73,16 @@ function makeObject(index) {
 		answers[i] = questionSheet.getRange(index, 7 + i).getValue();
 	}
 
+	var correctAnswer = questionSheet.getRange('E' + index).getValue();
+
 	var obj = {
 		id: qId,
 		question: question,
 		type: typeOfQuestion,
 		code: hasCode,
-		answers: answers
+		answers: answers,
+		amountOfAnswers: amountOfAnswers,
+		correctAnswer: correctAnswer
 	};
 
 	return obj;
@@ -114,17 +118,16 @@ function makeForm() {
     form.setDescription('Тест по Алгоритмизации');
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
-    //form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getId());
+    // form.setDestination(FormApp.DestinationType.SPREADSHEET, currentSpreadsheet.getId());
+    // form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getSheetId());
 
     for (var i = 0; i < 5; i++) {
-    	Logger.log("Iteration: " + i);
-    	Logger.log(dataset[i].id);
+    	// Logger.log(dataset[i].id);
     	var item;
     	var imgId;
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
     			imgId = getImageId(dataset[i]);
-    			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
@@ -140,7 +143,6 @@ function makeForm() {
     	else if (dataset[i].type == "один") {
     		if (dataset[i].code != "") {
     			imgId = getImageId(dataset[i]);
-    			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
@@ -156,7 +158,6 @@ function makeForm() {
     	else if (dataset[i].type == "строка") {
     		if (dataset[i].code != "") {
     			imgId = getImageId(dataset[i]);
-    			Logger.log(imgId);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
     				.setImage(img)
@@ -170,7 +171,7 @@ function makeForm() {
     	}
     }
 
-    // Form.submitGrades();
+    return formId;
 }
 
 function getImageId(obj) {
@@ -184,6 +185,16 @@ function getImageId(obj) {
 	return idLink;
 }
 
-function defineCorrectAnswers() {
-	
+function onFormSubmit(e) {
+	var form = FormApp.openById(makeForm());
+	var responses = e.response.getItemResponses();
+	var currentRow = 2;
+	answerSheet.getRange(2, 1, 1, 5);
+}
+
+function addTrigger() {
+    ScriptApp.newTrigger('onSubmit')
+        .forForm(makeForm())
+        .onFormSubmit()
+        .create();
 }
