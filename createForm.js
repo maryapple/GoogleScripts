@@ -186,14 +186,19 @@ function getImageId(obj) {
 }
 
 function onFormSubmit(e) {
-	var form = FormApp.openById(makeForm());
+	var form = e.source;
 	var responses = e.response.getItemResponses();
+	for (var i = 0; i < responses.length; i++) {
+		responses[i];
+		Logger.log(responses[i].getValue());
+	}
+	// Logger.log(responses);
 	var currentRow = 2;
-	answerSheet.getRange(2, 1, 1, 5);
+	answerSheet.getRange('A1').setValue(responses.toString());
 }
 
 function addTrigger() {
-    ScriptApp.newTrigger('onSubmit')
+    ScriptApp.newTrigger('onFormSubmit')
         .forForm(makeForm())
         .onFormSubmit()
         .create();
