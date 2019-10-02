@@ -168,6 +168,8 @@ function makeForm() {
     	}
     }
 
+    PropertiesService.getScriptProperties().setProperty("tempId", formId);
+
     return formId;
 }
 
@@ -184,21 +186,62 @@ function getImageId(obj) {
 
 function onFormSubmit(e) {
 	var form = e.source;
-	answerSheet.getRange('A2').setValue(form.getId());
-	var responses = e.response.getItemResponses();
-	Logger.log(responses);
-	for (var i = 0; i < responses.length; i++) {
-		Logger.log(responses[i].getValue());
-		answerSheet.getRange(2, 2 + i).setValue(responses.toString())
+
+	var lineNumber;
+
+	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
+		if (answerSheet.getRange("A" + lineNumber).getValue() === "") {
+			break;
+		}
 	}
-	// Logger.log(responses);
-	var currentRow = 2;
-	answerSheet.getRange('A1').setValue(responses.toString());
+
+	answerSheet.getRange("A" + lineNumber).setValue(form.getId());
+
+	var formResponses = form.getResponses(); // Массив ответов на форму от разных людей
+	var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий ответ человека
+	var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
+	
+	for (var j = 0; j < itemResponses.length; j++) {
+		var itemResponse = itemResponses[j]; // itemResponse - текущий ответ из ответа студента
+		// Logger.log('Response #%s to the question "%s" was "%s"',
+		// 		(j + 1).toString(),
+		// 		itemResponse.getItem().getTitle(),
+		// 		itemResponse.getResponse()
+		// 	);
+		answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumber).setValue(itemResponse.getResponse().toString());
+	}
+	
+  	form.setAcceptingResponses(false);
+
+	deleteTriggerById(form.getId());
 }
 
 function addTrigger() {
-    ScriptApp.newTrigger('onFormSubmit')
+    var trigger = ScriptApp.newTrigger('onFormSubmit')
         .forForm(makeForm())
         .onFormSubmit()
         .create();
+
+    PropertiesService.getScriptProperties().setProperty(
+    	PropertiesService.getScriptProperties().getProperty("tempId"), 
+    	trigger.getUniqueId());	
+}
+
+function deleteTriggerById(formId) {
+  var triggerId = PropertiesService.getScriptProperties().getProperty(formId);
+  var triggers = ScriptApp.getProjectTriggers();
+  
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getUniqueId() === triggerId) {
+      ScriptApp.deleteTrigger(triggers[i]);
+      Logger.log('Deleted triggerId: ' + triggerId);
+    }
+  }
+}
+
+function onOpen(e) {
+  var menu = SpreadsheetApp.getUi().createAddonMenu();
+  
+  menu.addItem('Создать форму', 'addTrigger');
+  menu.addToUi();
 }
