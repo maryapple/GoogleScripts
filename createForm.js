@@ -118,11 +118,8 @@ function makeForm() {
     form.setDescription('Тест по Алгоритмизации');
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
-    // form.setDestination(FormApp.DestinationType.SPREADSHEET, currentSpreadsheet.getId());
-    // form.setDestination(FormApp.DestinationType.SPREADSHEET, answerSheet.getSheetId());
 
     for (var i = 0; i < 5; i++) {
-    	// Logger.log(dataset[i].id);
     	var item;
     	var imgId;
     	if (dataset[i].type == "много") {
@@ -187,10 +184,12 @@ function getImageId(obj) {
 
 function onFormSubmit(e) {
 	var form = e.source;
+	answerSheet.getRange('A2').setValue(form.getId());
 	var responses = e.response.getItemResponses();
+	Logger.log(responses);
 	for (var i = 0; i < responses.length; i++) {
-		responses[i];
 		Logger.log(responses[i].getValue());
+		answerSheet.getRange(2, 2 + i).setValue(responses.toString())
 	}
 	// Logger.log(responses);
 	var currentRow = 2;
