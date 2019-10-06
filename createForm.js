@@ -2,6 +2,7 @@ var currentSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 var questionSheet = currentSpreadsheet.getSheetByName("Вопросы");
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 
+// Counts the amount of questions in the question sheet
 function countQuestions() {
 	var range = questionSheet.getRange(2, 1, 30).getValues();
 	var quantityOfQuestions = 0;
@@ -187,30 +188,34 @@ function getImageId(obj) {
 function onFormSubmit(e) {
 	var form = e.source;
 
+	// Поиск пустой строки
 	var lineNumber;
-
 	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
 		if (answerSheet.getRange("A" + lineNumber).getValue() === "") {
 			break;
 		}
 	}
 
+	// Записываем Id формы
 	answerSheet.getRange("A" + lineNumber).setValue(form.getId());
 
+	// Достаем ответ на вопрос из формы
 	var formResponses = form.getResponses(); // Массив ответов на форму от разных людей
-	var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий ответ человека
+	var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
 	var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
 	
 	for (var j = 0; j < itemResponses.length; j++) {
 		var itemResponse = itemResponses[j]; // itemResponse - текущий ответ из ответа студента
-		// Logger.log('Response #%s to the question "%s" was "%s"',
-		// 		(j + 1).toString(),
+
+		// Logger.log('Response to the question "%s" was "%s"',
 		// 		itemResponse.getItem().getTitle(),
 		// 		itemResponse.getResponse()
 		// 	);
+
+		// Запишем ответы на вопросы в пустые ячейки
 		answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumber).setValue(itemResponse.getResponse().toString());
 	}
-	
+	// Принимаем не более одного ответа
   	form.setAcceptingResponses(false);
 
 	deleteTriggerById(form.getId());
@@ -228,20 +233,18 @@ function addTrigger() {
 }
 
 function deleteTriggerById(formId) {
-  var triggerId = PropertiesService.getScriptProperties().getProperty(formId);
-  var triggers = ScriptApp.getProjectTriggers();
-  
-  for (var i = 0; i < triggers.length; i++) {
-    if (triggers[i].getUniqueId() === triggerId) {
-      ScriptApp.deleteTrigger(triggers[i]);
-      Logger.log('Deleted triggerId: ' + triggerId);
-    }
-  }
+	var triggerId = PropertiesService.getScriptProperties().getProperty(formId);
+	var triggers = ScriptApp.getProjectTriggers();
+
+	for (var i = 0; i < triggers.length; i++) {
+		if (triggers[i].getUniqueId() === triggerId) {
+			ScriptApp.deleteTrigger(triggers[i]);
+		}
+	}
 }
 
 function onOpen(e) {
-  var menu = SpreadsheetApp.getUi().createAddonMenu();
-  
-  menu.addItem('Создать форму', 'addTrigger');
-  menu.addToUi();
+	var menu = SpreadsheetApp.getUi().createAddonMenu();
+	menu.addItem('Создать форму', 'addTrigger');
+	menu.addToUi();
 }
