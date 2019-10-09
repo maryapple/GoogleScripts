@@ -218,8 +218,12 @@ function onFormSubmit(e) {
 	// Принимаем не более одного ответа
   	form.setAcceptingResponses(false);
 
+  	computeTheGrade();
+
 	deleteTriggerById(form.getId());
 }
+
+function computeTheGrade();
 
 function addTrigger() {
     var trigger = ScriptApp.newTrigger('onFormSubmit')
