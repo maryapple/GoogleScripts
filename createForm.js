@@ -123,28 +123,37 @@ function makeForm() {
     for (var i = 0; i < 5; i++) {
     	var item;
     	var imgId;
+    	var arr = [];
+    	var a = '';
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
     			imgId = getImageId(dataset[i]);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
-    				.setImage(img)
-    				.setTitle(i + 1 + ". " + dataset[i].question);
+    				.setImage(img);
+    				// .setTitle(i + 1 + ". " + dataset[i].question);
 				item = form.addCheckboxItem();
+				item.setTitle(i + 1 + ". " + dataset[i].question);
 	    	}
 	    	else {
 	    		item = form.addCheckboxItem();
 	    		item.setTitle(i + 1 + ". " + dataset[i].question);
 	    	}
 	    	item.setChoiceValues(dataset[i].answers);
+
+			/*for (var t = 0; t < 5; t++) {
+				a = dataset[i].answers[t];
+				arr.push(("item.createChoice("+a+")"));
+			}
+			item.setChoices(arr);*/
 		}
     	else if (dataset[i].type == "один") {
     		if (dataset[i].code != "") {
     			imgId = getImageId(dataset[i]);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
-    				.setImage(img)
-    				.setTitle(i + 1 + ". " + dataset[i].question);
+    				.setImage(img);
+    				// .setTitle(i + 1 + ". " + dataset[i].question);
 				item = form.addMultipleChoiceItem();
 	    	}
 	    	else {
@@ -158,9 +167,10 @@ function makeForm() {
     			imgId = getImageId(dataset[i]);
     			var img = DriveApp.getFileById(imgId);
     			form.addImageItem()
-    				.setImage(img)
-    				.setTitle(i + 1 + ". " + dataset[i].question);
+    				.setImage(img);
+    				// .setTitle(i + 1 + ". " + dataset[i].question);
 				item = form.addTextItem();
+				item.setTitle(i + 1 + ". " + dataset[i].question);
 			}
 			else {
 	    		form.addTextItem()
@@ -196,9 +206,43 @@ function getImageId(obj) {
 }
 
 // Проверка текущего ответа на правильность
-/*function isResponseCorrect(j, resp) {
+function isResponseCorrect(resp) {
 	var quest = resp.getItem().getTitle();
-}*/
+	quest = quest.slice(3);
+	for (var i = 2; i < 2000; i++) {
+		if (questionSheet.getRange('B' + i).getValue() === quest) {
+
+			if (questionSheet.getRange('D' + i).getValue() === 'один') {
+				correct = questionSheet.getRange(70 + questionSheet.getRange('E' + i).getValue(), i).getValue();
+				if (resp.getResponse() === correct) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+
+			else if (questionSheet.getRange('D' + i).getValue() === 'строка') {
+				if (questionSheet.getRange('E' + i).getValue() === quest.getResponse()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+
+			else if (questionSheet.getRange('D' + i).getValue() === 'много') {
+				// использовать includes
+/*				for (var q = 0; q < questionSheet.getRange('E' + i).getValue()).length; q++) {
+
+				}*/
+
+				// неееет, response вернет не 124 а строками всеееее
+				
+			}
+		}
+	}
+}
 
 // Подсчет оценки
 // function computeTheGrade() { }
@@ -238,7 +282,7 @@ function handleTheForm() {
 					for (var j = 0; j < itemResponses.length; j++) {
 						var itemResponse = itemResponses[j];
 						answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumberOfAnswer).setValue(itemResponse.getResponse().toString());
-						// isResponseCorrect(j, itemResponse);
+						isResponseCorrect(itemResponse);
 					}
 					// Принимаем не более одного ответа
 				  	form.setAcceptingResponses(false);
