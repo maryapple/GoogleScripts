@@ -205,13 +205,13 @@ function getImageId(obj) {
 	return idLink;
 }
 
-// Проверка текущего ответа на правильность
+// Проверка текущего ответа (одного ответа) на правильность
 function isResponseCorrect(resp) {
 	var quest = resp.getItem().getTitle();
 	quest = quest.slice(3);
 	for (var i = 2; i < 2000; i++) {
 		if (questionSheet.getRange('B' + i).getValue() === quest) {
-
+			// Если тип вопроса - Единственный выбор
 			if (questionSheet.getRange('D' + i).getValue() === 'один') {
 				correct = questionSheet.getRange(70 + questionSheet.getRange('E' + i).getValue(), i).getValue();
 				if (resp.getResponse() === correct) {
@@ -231,14 +231,41 @@ function isResponseCorrect(resp) {
 				}
 			}
 
+			// Если тип вопроса - Множественный выбор
 			else if (questionSheet.getRange('D' + i).getValue() === 'много') {
-				// использовать includes
-/*				for (var q = 0; q < questionSheet.getRange('E' + i).getValue()).length; q++) {
-
-				}*/
-
-				// неееет, response вернет не 124 а строками всеееее
+				// Формируем массив. состоящий из правильных ответов. Массив состоит из строк
+				var answers = [];
+				for (var q = 0; q < questionSheet.getRange('E' + i).getValue().length; q++) {
+					correctAnsw = questionSheet.getRange('E' + i).getValue();
+					if (correctAnsw / 10 > 0) {
+						var t = correctAnsw % 10;
+						answers.push(questionSheet.getRange(i, 70 + t).getValue());
+						correctAnsw /= 10;
+					}
+					else {
+						answers.push(questionSheet.getRange(i, 70 + correctAnsw).getValue());
+					}
+				}
 				
+				var answersCurrent = resp.getResponse();
+				// Logger.log(answersCurrent);
+				var cntr = 0;
+				for (var q = 0; q < answersCurrent.length; q++) {
+					 
+					if (answers.indexOf(answersCurrent[q] === -1)) {
+						return false;
+					}
+					else {
+						cntr++;
+					}
+				}
+
+				if (cntr === answers.length) {
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 		}
 	}
@@ -260,17 +287,22 @@ function handleTheForm() {
 	var id_;
 	var form;
 	var formResponses;
+	var grade = 0;
 	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
+		// Если найдена форма
 		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
+			// Если Форма еще не обработана
 			if (formSheet.getRange("C" + lineNumber).getValue() === "") {
 				id_ = formSheet.getRange("A" + (lineNumber)).getValue();
 				form = FormApp.openById(id_);
 				formResponses = form.getResponses();
+				// Если на форму есть ответы
 				if (formResponses.length > 0) {
 					formSheet.getRange("C" + (lineNumber)).setValue("*");
 					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
 					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
 
+					// Находим пустую строку для записи ответов
 					var lineNumberOfAnswer;
 					for (lineNumberOfAnswer = 2; lineNumberOfAnswer < 2000; lineNumberOfAnswer++) {
 						if (answerSheet.getRange("A" + lineNumberOfAnswer).getValue() === "") {
@@ -282,7 +314,9 @@ function handleTheForm() {
 					for (var j = 0; j < itemResponses.length; j++) {
 						var itemResponse = itemResponses[j];
 						answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumberOfAnswer).setValue(itemResponse.getResponse().toString());
-						isResponseCorrect(itemResponse);
+						if (isResponseCorrect(itemResponse) === true) {
+							grade++;
+						}
 					}
 					// Принимаем не более одного ответа
 				  	form.setAcceptingResponses(false);
