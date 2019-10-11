@@ -3,6 +3,12 @@ var questionSheet = currentSpreadsheet.getSheetByName("Вопросы");
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 var formSheet = currentSpreadsheet.getSheetByName("Формы");
 
+function onOpen(e) {
+	var menu = SpreadsheetApp.getUi().createAddonMenu();
+	menu.addItem('Создать формы', 'makeForm');
+	menu.addToUi();
+}
+
 // Counts the amount of questions in the question sheet
 function countQuestions() {
 	var range = questionSheet.getRange(2, 1, 30).getValues();
@@ -205,6 +211,64 @@ function getImageId(obj) {
 	return idLink;
 }
 
+function createTimeDrivenTriggers() {
+	ScriptApp.newTrigger('handleTheForm')
+				.timeBased()
+				.everyMinutes(1)
+				.create();
+}
+
+function handleTheForm() {
+	// lineNumber -номер строки, в которой форма еще не проверена, но пройдена учеником
+	var lineNumber;
+	var id_;
+	var form;
+	var formResponses;
+	var grade = 0;
+	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
+		// Если найдена форма
+		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
+			// Если Форма еще не обработана
+			if (formSheet.getRange("C" + lineNumber).getValue() === "") {
+				id_ = formSheet.getRange("A" + (lineNumber)).getValue();
+				form = FormApp.openById(id_);
+				formResponses = form.getResponses();
+				// Если на форму есть ответы
+				if (formResponses.length > 0) {
+					formSheet.getRange("C" + (lineNumber)).setValue("*");
+					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
+					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
+
+					// Находим пустую строку для записи ответов
+					var lineNumberOfAnswer;
+					for (lineNumberOfAnswer = 2; lineNumberOfAnswer < 2000; lineNumberOfAnswer++) {
+						if (answerSheet.getRange("A" + lineNumberOfAnswer).getValue() === "") {
+							break;
+						}
+					}
+					
+					answerSheet.getRange(String.fromCharCode(65) + lineNumberOfAnswer).setValue(id_);
+					for (var j = 0; j < itemResponses.length; j++) {
+						var itemResponse = itemResponses[j];
+						answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumberOfAnswer).setValue(itemResponse.getResponse().toString());
+						if (isResponseCorrect(itemResponse) === true) {
+							grade++;
+						}
+					}
+					// Принимаем не более одного ответа
+				  	form.setAcceptingResponses(false);
+
+				  	grade = computeTheGrade(grade);
+
+				  	setGradeToTable(grade, lineNumberOfAnswer);
+				}
+			}	
+		} else {
+			break;
+		}
+	}
+}
+
 // Проверка текущего ответа (одного ответа) на правильность
 function isResponseCorrect(resp) {
 	var quest = resp.getItem().getTitle();
@@ -271,67 +335,13 @@ function isResponseCorrect(resp) {
 	}
 }
 
-// Подсчет оценки
-// function computeTheGrade() { }
-
-function createTimeDrivenTriggers() {
-	ScriptApp.newTrigger('handleTheForm')
-				.timeBased()
-				.everyMinutes(1)
-				.create();
+// Подсчет оценки по 10-балльной шкале
+function computeTheGrade(grade) {
+	return grade / 5 * 2;
 }
 
-function handleTheForm() {
-	// lineNumber -номер строки, в которой форма еще не проверена, но пройдена учеником
-	var lineNumber;
-	var id_;
-	var form;
-	var formResponses;
-	var grade = 0;
-	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
-		// Если найдена форма
-		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
-			// Если Форма еще не обработана
-			if (formSheet.getRange("C" + lineNumber).getValue() === "") {
-				id_ = formSheet.getRange("A" + (lineNumber)).getValue();
-				form = FormApp.openById(id_);
-				formResponses = form.getResponses();
-				// Если на форму есть ответы
-				if (formResponses.length > 0) {
-					formSheet.getRange("C" + (lineNumber)).setValue("*");
-					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
-					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
-
-					// Находим пустую строку для записи ответов
-					var lineNumberOfAnswer;
-					for (lineNumberOfAnswer = 2; lineNumberOfAnswer < 2000; lineNumberOfAnswer++) {
-						if (answerSheet.getRange("A" + lineNumberOfAnswer).getValue() === "") {
-							break;
-						}
-					}
-					
-					answerSheet.getRange(String.fromCharCode(65) + lineNumberOfAnswer).setValue(id_);
-					for (var j = 0; j < itemResponses.length; j++) {
-						var itemResponse = itemResponses[j];
-						answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumberOfAnswer).setValue(itemResponse.getResponse().toString());
-						if (isResponseCorrect(itemResponse) === true) {
-							grade++;
-						}
-					}
-					// Принимаем не более одного ответа
-				  	form.setAcceptingResponses(false);
-
-				  	// computeTheGrade();
-				}
-			}	
-		} else {
-			break;
-		}
-	}
-}
-
-function onOpen(e) {
-	var menu = SpreadsheetApp.getUi().createAddonMenu();
-	menu.addItem('Создать формы', 'makeForm');
-	menu.addToUi();
+// Выстваление оценки в таблицу
+function setGradeToTable(grade, lineNumberOfAnswer) {
+	answerSheet.getRange(lineNumberOfAnswer, G).setValue(grade * 10);
+	answerSheet.getRange(lineNumberOfAnswer, H).setValue(grade);
 }
