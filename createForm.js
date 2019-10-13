@@ -11,13 +11,7 @@
 
 	// Counts the amount of questions in the question sheet
 	function countQuestions() {
-		var range = questionSheet.getRange(2, 1, 30).getValues();
-		var quantityOfQuestions = 0;
-
-		for (var rowNumber = 2; questionSheet.getRange('A' + rowNumber).getValue() != ''; rowNumber++) {
-			quantityOfQuestions++;
-		}
-		return quantityOfQuestions;
+		return (questionSheet.getLastRow() - 1);
 	}
 
 	// Generates array of values between 2 and 24
@@ -119,8 +113,8 @@
 	    var form = FormApp.create(formName);
 
 		var formId = form.getId();
-	    var formURL = form.getPublishedUrl();
-	    var formEditURL = form.getEditUrl();
+	    /*var formURL = form.getPublishedUrl();
+	    var formEditURL = form.getEditUrl();*/
 
 	    form.setDescription('Тест по Алгоритмизации');
 	    form.setLimitOneResponsePerUser(true);
@@ -248,6 +242,8 @@
 					  	grade *= 2;
 
 					  	setGradeToTable(grade, lineNumberOfAnswer);
+
+
 					}
 				}	
 			} else {
