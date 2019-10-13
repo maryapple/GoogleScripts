@@ -10,3 +10,19 @@ function createCW() {
   }
   Classroom.Courses.CourseWork.create(courseWork, courseId);
 }
+
+// Находим id студента
+
+function getSubId(courseId, courseworkId, studentEmail) {
+  var studentId;
+  var subId;
+  var listOfStudents;
+  var listOfSubs;
+  var response;
+  
+  return subId
+}
+
+function setGrades() {
+	
+}
