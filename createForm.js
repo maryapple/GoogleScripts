@@ -158,7 +158,6 @@ function makeForm() {
 
 	// Записываем Id формы на лист Формы
     var lineNumber = formSheet.getLastRow() + 1;
-
 	formSheet.getRange("A" + lineNumber).setValue(formId);
 
     return formId;
@@ -203,14 +202,8 @@ function handleTheForm() {
 					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
 					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
 
-					// Находим пустую строку для записи ответов
-					var lineNumberOfAnswer;
-					for (lineNumberOfAnswer = 2; lineNumberOfAnswer < 2000; lineNumberOfAnswer++) {
-						if (answerSheet.getRange("A" + lineNumberOfAnswer).getValue() === "") {
-							break;
-						}
-					}
-					
+					// Находим пустую строку на листе Ответы для записи ответов
+					var lineNumberOfAnswer = answerSheet.getLastRow() + 1;
 					answerSheet.getRange(String.fromCharCode(65) + lineNumberOfAnswer).setValue(id_);
 					for (var j = 0; j < itemResponses.length; j++) {
 						var itemResponse = itemResponses[j];
@@ -253,7 +246,6 @@ function isResponseCorrect(resp) {
 					return true;
 				}
 				else {
-					// Logger.log('response is not correct 1');
 					return false;
 				}
 			}
@@ -265,7 +257,6 @@ function isResponseCorrect(resp) {
 					return true;
 				}
 				else {
-					// Logger.log('response is not correct 2');
 					return false;
 				}
 			}
@@ -287,7 +278,6 @@ function isResponseCorrect(resp) {
 				for (var q = 0; q < answersCurrent.length; q++) {
 					var index = answers.indexOf(answersCurrent[q]);
 					if (index === -1) {
-						// Logger.log('response is not correct 3');
 						return false;
 					}
 					else {
@@ -300,7 +290,6 @@ function isResponseCorrect(resp) {
 					return true;
 				}
 				else {
-					// Logger.log('response is not correct 3');
 					return false;
 				}
 			}
@@ -309,7 +298,7 @@ function isResponseCorrect(resp) {
 	}
 }
 
-// Выстваление оценки в таблицу
+// Выставление оценки в таблицу
 function setGradeToTable(grade, lineNumberOfAnswer) {
 	answerSheet.getRange("G" + lineNumberOfAnswer).setValue(grade * 10);
 	answerSheet.getRange("H" + lineNumberOfAnswer).setValue(grade);
