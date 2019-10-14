@@ -220,6 +220,8 @@ function handleTheForm() {
 				  	grade *= 2;
 
 				  	setGradeToTable(grade, lineNumberOfAnswer);
+
+				  	setGradeToClassroom(grade, lineNumberOfAnswer);
 				}
 			}	
 		} else {
@@ -314,6 +316,8 @@ function makeFormForGroup() {
 		var id = makeForm(studentEmail);
 		studentSheet.getRange('C' + i).setValue(id);
 		// Делаем задание в классруме
-		createCW(id);
+		createCW(id, studentEmail);
+
+		getSubId(studentEmail);
 	}
 }
