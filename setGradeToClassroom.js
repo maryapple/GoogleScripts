@@ -1,18 +1,19 @@
+var courseId = 23948313103;
+
 // Make a task in Google Classroom
-function createCW() {
-  var courseId = 23948313103;
+function createCW(id) {
+  var existingForm = FormApp.openById(id);
   var courseWork = {
-    "title"       : "Тест №1",
-    "materials"   : { "link" : { "url" : `${form.getPublishedUrl()}` } },
-    "state"       : "DRAFT",
-    "maxPoints"   : 10,
-    "workType"    : "ASSIGNMENT",
-    "individualStudentsOptions": {"studentIds": subId}
-  }
+      "title"       : "Тест №1",
+      "materials"   : { "link" : { "url" : existingForm.getPublishedUrl() } },
+      "state"       : "DRAFT",
+      "maxPoints"   : 10,
+      "workType"    : "ASSIGNMENT"
+    }
   Classroom.Courses.CourseWork.create(courseWork, courseId);
 }
 
-// Get the id of student
+/*// Get the id of student
 function getSubId(courseId, courseworkId, studentEmail) {
   var studentId;
   var subId;
@@ -21,8 +22,4 @@ function getSubId(courseId, courseworkId, studentEmail) {
   var response;
   
   return subId
-}
-
-function setGrades() {
-	
-}
+}*/

@@ -2,10 +2,12 @@ var currentSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 var questionSheet = currentSpreadsheet.getSheetByName("Вопросы");
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 var formSheet = currentSpreadsheet.getSheetByName("Формы");
+var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
 
 function onOpen(e) {
 	var menu = SpreadsheetApp.getUi().createAddonMenu();
-	menu.addItem('Создать формы', 'makeForm');
+	menu.addItem('Создать формы для группы', 'makeFormForGroup');
+	// menu.addItem('Создать формы', 'makeForm');
 	menu.addToUi();
 }
 
@@ -99,10 +101,10 @@ function makeQuestionset() {
 }
 
 // Create unique form for one person
-function makeForm() {
+function makeForm(studentEmail) {
 	var dataset = makeQuestionset();
 
-	var studentEmail = 'marrryapple@gmail.com';
+	// var studentEmail = 'marrryapple@gmail.com';
 
 	var formName = 'Тест ' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
@@ -159,7 +161,6 @@ function makeForm() {
 	// Записываем Id формы на лист Формы
     var lineNumber = formSheet.getLastRow() + 1;
 	formSheet.getRange("A" + lineNumber).setValue(formId);
-
     return formId;
 }
 
@@ -192,13 +193,13 @@ function handleTheForm() {
 		// Если найдена форма
 		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
 			// Если Форма еще не обработана
-			if (formSheet.getRange("C" + lineNumber).getValue() === "") {
+			if (formSheet.getRange("B" + lineNumber).getValue() === "") {
 				id_ = formSheet.getRange("A" + (lineNumber)).getValue();
 				form = FormApp.openById(id_);
 				formResponses = form.getResponses();
 				// Если на форму есть ответы
 				if (formResponses.length > 0) {
-					formSheet.getRange("C" + (lineNumber)).setValue("*");
+					formSheet.getRange("B" + (lineNumber)).setValue("*");
 					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
 					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
 
@@ -242,7 +243,7 @@ function isResponseCorrect(resp) {
 				Logger.log('The correct resp: ' + correct);
 				Logger.log('The current resp: ' + resp.getResponse());
 				if (resp.getResponse() === correct) {
-					Logger.log('response is correct 1');
+					// Logger.log('response is correct 1');
 					return true;
 				}
 				else {
@@ -253,7 +254,7 @@ function isResponseCorrect(resp) {
 			else if (questionSheet.getRange('D' + i).getValue() === 'строка') {
 				Logger.log('The correct: ' + questionSheet.getRange('E' + i).getValue().toString() + '\nThe current resp: ' + resp.getResponse().toString());
 				if (questionSheet.getRange('E' + i).getValue().toString() === resp.getResponse().toString()) {
-					Logger.log('response is correct 2');
+					// Logger.log('response is correct 2');
 					return true;
 				}
 				else {
@@ -286,7 +287,7 @@ function isResponseCorrect(resp) {
 				}
 
 				if (cnt === answers.length) {
-					Logger.log('response is correct 3');
+					// Logger.log('response is correct 3');
 					return true;
 				}
 				else {
@@ -302,4 +303,17 @@ function isResponseCorrect(resp) {
 function setGradeToTable(grade, lineNumberOfAnswer) {
 	answerSheet.getRange("G" + lineNumberOfAnswer).setValue(grade * 10);
 	answerSheet.getRange("H" + lineNumberOfAnswer).setValue(grade);
+}
+
+function makeFormForGroup() {
+	var amountOfPeople = studentSheet.getLastRow() + 1; // 5
+	var studentEmail;
+	var formId;
+	for (var i = 3; i < amountOfPeople; i++) {
+		studentEmail = studentSheet.getRange('A' + i).getValue();
+		var id = makeForm(studentEmail);
+		studentSheet.getRange('C' + i).setValue(id);
+		// Делаем задание в классруме
+		createCW(id);
+	}
 }
