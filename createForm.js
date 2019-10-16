@@ -316,8 +316,13 @@ function makeFormForGroup() {
 		var id = makeForm(studentEmail);
 		studentSheet.getRange('C' + i).setValue(id);
 		// Делаем задание в классруме
+//    var studentId = getSubId(studentEmail);
+//    if (studentId) {
+//      createCW(id, studentEmail);
+//    }
+		// Делаем задание в классруме
 		createCW(id, studentEmail);
 
-		getSubId(studentEmail);
+		// getSubId(studentEmail);
 	}
 }
