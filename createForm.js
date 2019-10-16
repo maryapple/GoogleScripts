@@ -103,16 +103,9 @@ function makeQuestionset() {
 // Create unique form for one person
 function makeForm(studentEmail) {
 	var dataset = makeQuestionset();
-
-	// var studentEmail = 'marrryapple@gmail.com';
-
-	var formName = 'Тест ' + ' - ' + studentEmail;
+	var formName = 'Тест 1' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
-
 	var formId = form.getId();
-    /*var formURL = form.getPublishedUrl();
-    var formEditURL = form.getEditUrl();*/
-
     form.setDescription('Тест по Алгоритмизации');
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
@@ -221,20 +214,22 @@ function handleTheForm() {
 
 				  	setGradeToTable(grade, lineNumberOfAnswer);
 
-				  	setGradeToClassroom(grade, lineNumberOfAnswer);
+				  	setGradeToClassroom(grade, lineNumberOfAnswer, id_);
 				}
 			}	
 		} else {
 			break;
 		}
 	}
+
+
 }
 
 // Проверка текущего ответа (одного ответа) на правильность
 function isResponseCorrect(resp) {
 	var quest = resp.getItem().getTitle();
 	quest = quest.slice(3);
-	Logger.log('The quest from FORM: ' + quest);
+	// Logger.log('The quest from FORM: ' + quest);
 	// Ищем на странице с пулом вопросом идентичный вопрос
 	for (var i = 2; i < 100; i++) {
 		if (questionSheet.getRange('B' + i).getValue() === quest) {
@@ -242,8 +237,8 @@ function isResponseCorrect(resp) {
 			if (questionSheet.getRange('D' + i).getValue() === 'один') {
 				var num = questionSheet.getRange('E' + i).getValue();
 				correct = questionSheet.getRange(String.fromCharCode(70 + num) + i).getValue();
-				Logger.log('The correct resp: ' + correct);
-				Logger.log('The current resp: ' + resp.getResponse());
+				/*Logger.log('The correct resp: ' + correct);
+				Logger.log('The current resp: ' + resp.getResponse());*/
 				if (resp.getResponse() === correct) {
 					// Logger.log('response is correct 1');
 					return true;
@@ -254,9 +249,8 @@ function isResponseCorrect(resp) {
 			}
 
 			else if (questionSheet.getRange('D' + i).getValue() === 'строка') {
-				Logger.log('The correct: ' + questionSheet.getRange('E' + i).getValue().toString() + '\nThe current resp: ' + resp.getResponse().toString());
+				// Logger.log('The correct: ' + questionSheet.getRange('E' + i).getValue().toString() + '\nThe current resp: ' + resp.getResponse().toString());
 				if (questionSheet.getRange('E' + i).getValue().toString() === resp.getResponse().toString()) {
-					// Logger.log('response is correct 2');
 					return true;
 				}
 				else {
@@ -274,7 +268,7 @@ function isResponseCorrect(resp) {
 				// Текущие ответы из формы
 				var answersCurrent = resp.getResponse();
 
-				Logger.log('Correct answ: ' + answers + '\nCur resp: ' + answersCurrent);
+				// Logger.log('Correct answ: ' + answers + '\nCur resp: ' + answersCurrent);
 
 				// Сверка ответов
 				var cnt = 0;
@@ -311,18 +305,13 @@ function makeFormForGroup() {
 	var amountOfPeople = studentSheet.getLastRow() + 1; // 5
 	var studentEmail;
 	var formId;
+	var cwId;
 	for (var i = 3; i < amountOfPeople; i++) {
 		studentEmail = studentSheet.getRange('A' + i).getValue();
 		var id = makeForm(studentEmail);
-		studentSheet.getRange('C' + i).setValue(id);
-		// Делаем задание в классруме
-//    var studentId = getSubId(studentEmail);
-//    if (studentId) {
-//      createCW(id, studentEmail);
-//    }
-		// Делаем задание в классруме
-		createCW(id, studentEmail);
-
-		// getSubId(studentEmail);
+		// Запишем id формы на лист Студенты
+		studentSheet.getRange('B' + i).setValue(id);
+		cwId = createCW(id, studentEmail, i);
+		studentSheet.getRange('E' + i).setValue(cwId);
 	}
 }

@@ -1,43 +1,34 @@
 var courseId = 23948313103;
+var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
+var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
 
 // Make a task in Google Classroom
-function createCW(id, studentEmail) {
+function createCW(id, studentEmail, i) {
 	var existingForm = FormApp.openById(id);
 	var swId;
 	var courseWork = {
-		"title"       : "Тест №1",
-		"materials"   : { "link" : { "url" : existingForm.getPublishedUrl() } },
-		"state"       : "PUBLISHED",
-		"maxPoints"   : 10,
-		"workType"    : "ASSIGNMENT",
-        "assigneeMode": "INDIVIDUAL_STUDENTS",
+		"title"		 : "Тест №1",
+		"materials"	 : { "link" : { "url" : existingForm.getPublishedUrl() } },
+		"state"		 : "PUBLISHED",
+		"maxPoints"	 : 10,
+		"workType"	: "ASSIGNMENT",
+		"assigneeMode": "INDIVIDUAL_STUDENTS",
 		"individualStudentsOptions": { "studentIds": [studentEmail] }
 	}
 	responseCourseWork = Classroom.Courses.CourseWork.create(courseWork, courseId);
-    Logger.log(responseCourseWork.id);
+	getSubId(studentEmail, responseCourseWork.id, i);
 	return responseCourseWork.id;
 }
 
-// List of all CW
-function getCW() {
-	var cwId;
-	var courseworks  = Classroom.Courses.CourseWork.list(courseId).courseWork;
-	for each(var cw in courseworks) { 
-		Logger.log("%s - %s", cw.id, cw.title) 
-	}
-}
-
-function test() {
-  getSubId('user01@');
-}
-
 // Get the id of student
-function getSubId(studentEmail) {
+function getSubId(studentEmail, cwId, i) {
 	Logger.log('studentEmail: ' + studentEmail);
 	var studentId;
 	var listOfStudents;
 	var response;
-
+	var pageTokenSubs;
+	var listOfSubs;
+	
 	var pageTokenStudents = null;
 	do {
 		if (pageTokenStudents) {
@@ -46,41 +37,91 @@ function getSubId(studentEmail) {
 		else {
 			response = Classroom.Courses.Students.list(courseId);
 		}
-
+		
 		listOfStudents = response.students;
-		// Logger.log('listOfStudents: ' + listOfStudents);
-		for each(var student in listOfStudents) {
-			Logger.log('student.profile.emailAddress: ' + student.profile.emailAddress);
-			if(student.profile.emailAddress === studentEmail) {
-			studentId = student.profile.id;
-
-			return studentId;
-			}
-		}
-
 		pageTokenStudents = response.nextPageToken;
-	} while(pageTokenStudents);
-
-	return null;
-
-	/*var pageTokenStudents = Classroom.Courses.Students.list(courseId).nextPageToken;
-	Logger.log('before the cycle');
-
-	// Не получается зайти в цикл
-	while(pageTokenStudents) {
-		Logger.log('in the cycle');
-		response = Classroom.Courses.Students.list(courseId, {pageToken: pageTokenStudents});
-		listOfStudents = response.students;
-		Logger.log('listOfStudents: ' + listOfStudents);
+		
 		for each(var student in listOfStudents) {
-			Logger.log('student.profile.emailAddress: ' + student.profile.emailAddress);
-			if(student.profile.emailAddress === studentEmail) {
+			if (student.profile.emailAddress === studentEmail) {
 				studentId = student.profile.id;
+				pageTokenStudents = null;
 				break;
 			}
 		}
+	} while(pageTokenStudents);
+	
+	studentSheet.getRange('C' + i).setValue(studentId);
+	// Logger.log(studentId);
+	
+	// Find submission for this student
+	pageTokenSubs = null;
+	do {
+		if (pageTokenSubs) {
+			response = Classroom.Courses.CourseWork.StudentSubmissions.list(courseId, cwId, {pageToken: pageTokenSubs});
+		} 
+		else {
+			response = Classroom.Courses.CourseWork.StudentSubmissions.list(courseId, cwId);
+		}
 		
-		pageTokenStudents = response.nextPageToken;
-	}
-	Logger.log('End f func getSubId');*/	
+		listOfSubs = response.studentSubmissions;
+		pageTokenSubs = response.nextPageToken;
+		
+		for each(var sub in listOfSubs) {
+			if (sub.userId === studentId) {
+				subId = sub.id;
+				pageTokenSubs = null;
+				break;
+			}
+		}
+	} while (pageTokenSubs);
+	Logger.log(subId);
+	studentSheet.getRange('D' + i).setValue(subId);
+	return subId;	
 }
+
+
+function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
+	var formId = id;
+	Logger.log('formId: ' + formId);
+	var studentEmail;
+	var subId;
+	var studentId;
+	var cwId;
+	//get student's email
+	for (var i = 3; i < studentSheet.getLastRow(); i++) {
+		if (studentSheet.getRange('B' + i).getValue() === formId) {
+			studentEmail = studentSheet.getRange('A' + i).getValue();
+			studentId = studentSheet.getRange('C' + i).getValue();
+			subId = studentSheet.getRange('D' + i).getValue();
+			cwId = studentSheet.getRange('E' + i).getValue();
+			break;
+		}
+	}
+	Logger.log(formId, studentEmail, studentId, subId, cwId);
+
+	//set grades
+	// https://developers.google.com/classroom/guides/manage-coursework
+	// При ошибке 404 - заново создать формы.
+	// Возможно, что неправильный воркфлоу -- формы проверяются до того, как студент сдает задание на проверку.
+	var resource = {'draftGrade' : grade};
+	var updateMask = {'updateMask' : 'draftGrade'};
+	var result = Classroom.Courses.CourseWork.StudentSubmissions.patch(resource, courseId, cwId, subId, updateMask);
+	Logger.log(result);
+
+	resource = {'assignedGrade' : grade};
+	updateMask = {'updateMask' : 'assignedGrade'};
+	result = Classroom.Courses.CourseWork.StudentSubmissions.patch(resource, courseId, cwId, subId, updateMask);
+	Logger.log(result);
+
+	// resource = {};
+	// result = Classroom.Courses.CourseWork.StudentSubmissions.return(resource, courseId, cwId, subId);
+	// Logger.log(result);
+}
+
+/*function createSpreadsheetEditTrigger() {
+	var ss = SpreadsheetApp.getActive();
+	ScriptApp.newTrigger('onEdit')
+		.forSpreadsheet(ss)
+		.onEdit()
+		.create();
+}*/
