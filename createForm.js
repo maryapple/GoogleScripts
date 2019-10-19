@@ -7,7 +7,6 @@ var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
 function onOpen(e) {
 	var menu = SpreadsheetApp.getUi().createAddonMenu();
 	menu.addItem('Создать формы для группы', 'makeFormForGroup');
-	// menu.addItem('Создать формы', 'makeForm');
 	menu.addToUi();
 }
 
@@ -106,15 +105,27 @@ function makeForm(studentEmail) {
 	var formName = 'Тест 1' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
 	var formId = form.getId();
+
+/*	var folderId = '14X-Gl7j9Zm1AAD8ERPKztRPcMF6OzGQr';
+	var file = DriveApp.getFileById(formId);
+	var folder = DriveApp.getFolderById(folderId);
+	var newFile = file.makeCopy(file, folder);
+
+	//Remove file from root folder--------------------------------//
+	DriveApp.getFileById(formId).setTrashed(true);*/
+
     form.setDescription('Тест по Алгоритмизации');
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
+
+    Logger.log(studentEmail, formId);
 
     for (var i = 0; i < 5; i++) {
     	var item;
     	var imgId;
     	var arr = [];
     	var a = '';
+    	Logger.log(dataset[i]);
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
     			imgId = getImageId(dataset[i]);
