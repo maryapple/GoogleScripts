@@ -105,6 +105,7 @@ function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
 	// Возможно, что неправильный воркфлоу -- формы проверяются до того, как студент сдает задание на проверку.
 	var resource = {'draftGrade' : grade};
 	var updateMask = {'updateMask' : 'draftGrade'};
+	Logger.log('formId: ' + formId + 'studentEmail: ' + studentEmail + 'studentId' +  studentId + ' subid: ' + subId + 'swID' +  cwId);
 	var result = Classroom.Courses.CourseWork.StudentSubmissions.patch(resource, courseId, cwId, subId, updateMask);
 	Logger.log(result);
 

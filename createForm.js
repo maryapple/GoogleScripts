@@ -13,43 +13,22 @@ function onOpen(e) {
 // Generates array of values between 2 and 24
 function makeRandomNumbers() {
 	var arr = [];
-
+	var n;
 	for (var i = 0; i < 5; i++) {
-		var n = randomNum();
+		n = randomNum();
 		if ( i <= 2) {
-			if (arr.indexOf(n) == -1) {
-				arr.push(n);
-			} 
-			else {
+			while(arr.indexOf(n) !== -1) {
 				n = randomNum();
-				if (arr.indexOf(n) == -1) {
-					arr.push(n);
-				}
-				else {
-					n = randomNum();
-					if (arr.indexOf(n) == -1) {
-						arr.push(n);
-					}
-				}
 			}
+			arr.push(n);
 		}
 		else {
-			if (arr.indexOf(n * 2) == -1) {
-				arr.push(n * 2);
-			} 
-			else {
+			while(arr.indexOf(n * 2) !== -1) {
 				n = randomNum();
-				if (arr.indexOf(n * 2) == -1) {
-					arr.push(n * 2);
-				}
-				else {
-					n = randomNum();
-					if (arr.indexOf(n * 2) == -1) {
-						arr.push(n * 2);
-					}
-				}
 			}
+			arr.push(n * 2);
 		}
+		Logger.log(arr[i]);
 	}
 	return arr;
 }
@@ -102,7 +81,7 @@ function makeQuestionset() {
 // Create unique form for one person
 function makeForm(studentEmail) {
 	var dataset = makeQuestionset();
-	var formName = 'Тест 1' + ' - ' + studentEmail;
+	var formName = 'Тест 2' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
 	var formId = form.getId();
 
@@ -124,7 +103,6 @@ function makeForm(studentEmail) {
     	var item;
     	var imgId;
     	var arr = [];
-    	var a = '';
     	Logger.log(dataset[i]);
     	if (dataset[i].type == "много") {
     		if (dataset[i].code != "") {
@@ -313,7 +291,7 @@ function setGradeToTable(grade, lineNumberOfAnswer) {
 }
 
 function makeFormForGroup() {
-	var amountOfPeople = studentSheet.getLastRow() + 1; // 5
+	var amountOfPeople = studentSheet.getLastRow() + 1;
 	var studentEmail;
 	var formId;
 	var cwId;
