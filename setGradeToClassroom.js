@@ -2,7 +2,7 @@ var courseId = 23948313103;
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
 
-// Make a task in Google Classroom
+// Create a task in Google Classroom
 function createCW(id, studentEmail, i) {
 	var existingForm = FormApp.openById(id);
 	var swId;
@@ -10,6 +10,7 @@ function createCW(id, studentEmail, i) {
 		"title"		 : "Тест №1",
 		"materials"	 : { "link" : { "url" : existingForm.getPublishedUrl() } },
 		"state"		 : "PUBLISHED",
+		// "scheduledTime": "2019-10-20T20:20:00.00Z",
 		"maxPoints"	 : 10,
 		"workType"	: "ASSIGNMENT",
 		"assigneeMode": "INDIVIDUAL_STUDENTS",
@@ -51,9 +52,8 @@ function getSubId(studentEmail, cwId, i) {
 	} while(pageTokenStudents);
 	
 	studentSheet.getRange('C' + i).setValue(studentId);
-	// Logger.log(studentId);
 	
-	// Find submission for this student
+	// Find submission for the student
 	pageTokenSubs = null;
 	do {
 		if (pageTokenSubs) {
@@ -101,8 +101,6 @@ function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
 
 	//set grades
 	// https://developers.google.com/classroom/guides/manage-coursework
-	// При ошибке 404 - заново создать формы.
-	// Возможно, что неправильный воркфлоу -- формы проверяются до того, как студент сдает задание на проверку.
 	var resource = {'draftGrade' : grade};
 	var updateMask = {'updateMask' : 'draftGrade'};
 	Logger.log('formId: ' + formId + 'studentEmail: ' + studentEmail + 'studentId' +  studentId + ' subid: ' + subId + 'swID' +  cwId);
@@ -113,16 +111,4 @@ function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
 	updateMask = {'updateMask' : 'assignedGrade'};
 	result = Classroom.Courses.CourseWork.StudentSubmissions.patch(resource, courseId, cwId, subId, updateMask);
 	Logger.log(result);
-
-	// resource = {};
-	// result = Classroom.Courses.CourseWork.StudentSubmissions.return(resource, courseId, cwId, subId);
-	// Logger.log(result);
 }
-
-/*function createSpreadsheetEditTrigger() {
-	var ss = SpreadsheetApp.getActive();
-	ScriptApp.newTrigger('onEdit')
-		.forSpreadsheet(ss)
-		.onEdit()
-		.create();
-}*/
