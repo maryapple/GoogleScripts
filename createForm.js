@@ -84,14 +84,16 @@ function makeForm(studentEmail) {
 	var formName = 'Тест 2' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
 	var formId = form.getId();
-
-/*	var folderId = '14X-Gl7j9Zm1AAD8ERPKztRPcMF6OzGQr';
 	var file = DriveApp.getFileById(formId);
-	var folder = DriveApp.getFolderById(folderId);
-	var newFile = file.makeCopy(file, folder);
 
-	//Remove file from root folder--------------------------------//
-	DriveApp.getFileById(formId).setTrashed(true);*/
+	// Remove the file from all parent folders
+	var parents = file.getParents();
+	while (parents.hasNext()) {
+		var parent = parents.next();
+		parent.removeFile(file);
+	}
+
+	DriveApp.getFolderById('14X-Gl7j9Zm1AAD8ERPKztRPcMF6OzGQr').addFile(file);
 
     form.setDescription('Тест по Алгоритмизации');
     form.setLimitOneResponsePerUser(true);
@@ -181,6 +183,7 @@ function handleTheForm() {
 				formResponses = form.getResponses();
 				// Если на форму есть ответы
 				if (formResponses.length > 0) {
+					grade = 0;
 					formSheet.getRange("B" + (lineNumber)).setValue("*");
 					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
 					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
@@ -210,8 +213,6 @@ function handleTheForm() {
 			break;
 		}
 	}
-
-
 }
 
 // Проверка текущего ответа (одного ответа) на правильность
