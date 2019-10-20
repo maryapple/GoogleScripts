@@ -2,7 +2,10 @@ var currentSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 var questionSheet = currentSpreadsheet.getSheetByName("Вопросы");
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 var formSheet = currentSpreadsheet.getSheetByName("Формы");
-var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
+// var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
+var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
+
+var studentSheet = studentTESTSheet;
 
 function onOpen(e) {
 	var menu = SpreadsheetApp.getUi().createAddonMenu();
@@ -16,6 +19,7 @@ function makeRandomNumbers() {
 	arr.push(randomNum(1, 23));
 	arr.push(randomNum(24, 33));
 	arr.push(randomNum(35, 43));
+	Logger.log(arr);
 	return arr;
 }
 
@@ -70,24 +74,21 @@ function makeForm(studentEmail) {
     var form = FormApp.create(formName);
 	var formId = form.getId();
 
-/*	var folderId = '14X-Gl7j9Zm1AAD8ERPKztRPcMF6OzGQr';
 	var file = DriveApp.getFileById(formId);
-	var folder = DriveApp.getFolderById(folderId);
-	var newFile = file.makeCopy(file, folder);
-
-	//Remove file from root folder--------------------------------//
-	DriveApp.getFileById(formId).setTrashed(true);*/
+	var parents = file.getParents();
+	while (parents.hasNext()) {
+		var parent = parents.next();
+		parent.removeFile(file);
+	}
+	DriveApp.getFolderById('1BVA2dEKB6xDf-WBo2gBI2HISNHw37KXW').addFile(file);
 
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
 
-    Logger.log(studentEmail, formId);
-
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 3; i++) {
     	var item;
     	var imgId;
     	var arr = [];
-    	Logger.log(dataset[i]);
     	if (dataset[i].type == "много") {
 	    	item = form.addCheckboxItem();
 	    	item.setTitle(i + 1 + ". " + dataset[i].question);
@@ -126,6 +127,7 @@ function handleTheForm() {
 	var form;
 	var formResponses;
 	var grade = 0;
+	var gradeFinal;
 	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
 		// Если найдена форма
 		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
@@ -153,9 +155,9 @@ function handleTheForm() {
 					// Принимаем не более одного ответа
 				  	form.setAcceptingResponses(false);
 
-				  	setGradeToTable(grade, lineNumberOfAnswer);
+				  	gradeFinal = setGradeToTable(grade, lineNumberOfAnswer);
 
-				  	setGradeToClassroom(grade, lineNumberOfAnswer, id_);
+				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_);
 				}
 			}	
 		} else {
@@ -253,6 +255,7 @@ function setGradeToTable(grade, lineNumberOfAnswer) {
 	}
 	answerSheet.getRange("G" + lineNumberOfAnswer).setValue(gradeFinal * 10);
 	answerSheet.getRange("H" + lineNumberOfAnswer).setValue(gradeFinal);
+	return gradeFinal;
 }
 
 function makeFormForGroup() {

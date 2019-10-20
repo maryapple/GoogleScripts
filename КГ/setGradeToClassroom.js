@@ -1,6 +1,10 @@
 var courseId = 23843643021;
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
-var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
+// var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
+
+var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
+
+var studentSheet = studentTESTSheet;
 
 // Make a task in Google Classroom
 function createCW(id, studentEmail, i) {

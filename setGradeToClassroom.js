@@ -88,7 +88,7 @@ function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
 	var studentId;
 	var cwId;
 	//get student's email
-	for (var i = 3; i < studentSheet.getLastRow(); i++) {
+	for (var i = 3; i <= studentSheet.getLastRow(); i++) {
 		if (studentSheet.getRange('B' + i).getValue() === formId) {
 			studentEmail = studentSheet.getRange('A' + i).getValue();
 			studentId = studentSheet.getRange('C' + i).getValue();
