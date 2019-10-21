@@ -1,13 +1,8 @@
 var courseId = 23843643021;
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
-// var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
-
-var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
-
-var studentSheet = studentTESTSheet;
 
 // Make a task in Google Classroom
-function createCW(id, studentEmail, i) {
+function createCW(id, studentEmail, i, studentSheet) {
 	var existingForm = FormApp.openById(id);
 	var swId;
 	var courseWork = {
@@ -20,12 +15,12 @@ function createCW(id, studentEmail, i) {
 		"individualStudentsOptions": { "studentIds": [studentEmail] }
 	}
 	responseCourseWork = Classroom.Courses.CourseWork.create(courseWork, courseId);
-	getSubId(studentEmail, responseCourseWork.id, i);
+	getSubId(studentEmail, responseCourseWork.id, i, studentSheet);
 	return responseCourseWork.id;
 }
 
 // Get the id of student
-function getSubId(studentEmail, cwId, i) {
+function getSubId(studentEmail, cwId, i, studentSheet) {
 	Logger.log('studentEmail: ' + studentEmail);
 	var studentId;
 	var listOfStudents;
@@ -76,21 +71,20 @@ function getSubId(studentEmail, cwId, i) {
 			}
 		}
 	} while (pageTokenSubs);
-	Logger.log(subId);
 	studentSheet.getRange('D' + i).setValue(subId);
 	return subId;	
 }
 
 
-function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
+function setGradeToClassroom(grade, lineNumberOfAnswer, id, studentSheet) {
 	var formId = id;
-	Logger.log('formId: ' + formId);
+	// Logger.log('formId: ' + formId);
 	var studentEmail;
 	var subId;
 	var studentId;
 	var cwId;
 	//get student's email
-	for (var i = 3; i < studentSheet.getLastRow(); i++) {
+	for (var i = 3; i <= studentSheet.getLastRow(); i++) {
 		if (studentSheet.getRange('B' + i).getValue() === formId) {
 			studentEmail = studentSheet.getRange('A' + i).getValue();
 			studentId = studentSheet.getRange('C' + i).getValue();
@@ -99,17 +93,17 @@ function setGradeToClassroom(grade, lineNumberOfAnswer, id) {
 			break;
 		}
 	}
-	Logger.log(formId, studentEmail, studentId, subId, cwId);
+	// Logger.log(formId, studentEmail, studentId, subId, cwId);
 
 	//set grades
 	var resource = {'draftGrade' : grade};
 	var updateMask = {'updateMask' : 'draftGrade'};
-	Logger.log('formId: ' + formId + 'studentEmail: ' + studentEmail + 'studentId' +  studentId + ' subid: ' + subId + 'swID' +  cwId);
+	// Logger.log('formId: ' + formId + 'studentEmail: ' + studentEmail + 'studentId' +  studentId + ' subid: ' + subId + 'swID' +  cwId);
 	var result = Classroom.Courses.CourseWork.StudentSubmissions.patch(resource, courseId, cwId, subId, updateMask);
-	Logger.log(result);
+	// Logger.log(result);
 
 	resource = {'assignedGrade' : grade};
 	updateMask = {'updateMask' : 'assignedGrade'};
 	result = Classroom.Courses.CourseWork.StudentSubmissions.patch(resource, courseId, cwId, subId, updateMask);
-	Logger.log(result);
+	// Logger.log(result);
 }

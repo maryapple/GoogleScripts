@@ -4,22 +4,64 @@ var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 var formSheet = currentSpreadsheet.getSheetByName("Формы");
 // var studentSheet = currentSpreadsheet.getSheetByName("Студенты");
 var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
-
-var studentSheet = studentTESTSheet;
+var studentSheet;
+// var studentSheet = studentTESTSheet;
 
 function onOpen(e) {
 	var menu = SpreadsheetApp.getUi().createAddonMenu();
-	menu.addItem('Создать формы для группы', 'makeFormForGroup');
+	// menu.addItem('Создать формы для группы', 'makeFormForGroup');
+	menu.addItem('test', 'test');
+	menu.addItem('БИВ181', 'group181');
+	menu.addItem('БИВ182', 'group182');
+	menu.addItem('БИВ183', 'group183');
+	menu.addItem('БИВ184', 'group184');
+	menu.addItem('БИВ185', 'group185');
+	menu.addItem('БИВ186', 'group186');
 	menu.addToUi();
+}
+
+function test() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
+	makeFormForGroup(studentSheet);
+}
+
+function group181() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыБИВ181");
+	makeFormForGroup(studentSheet);
+}
+
+function group182() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыБИВ182");
+	makeFormForGroup(studentSheet);
+}
+
+function group183() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыБИВ183");
+	makeFormForGroup(studentSheet);
+}
+
+function group184() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыБИВ184");
+	makeFormForGroup(studentSheet);
+}
+
+function group185() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыБИВ185");
+	makeFormForGroup(studentSheet);
+}
+
+function group186() {
+	studentSheet = currentSpreadsheet.getSheetByName("СтудентыБИВ186");
+	makeFormForGroup(studentSheet);
 }
 
 // Generates array of random values
 function makeRandomNumbers() {
 	var arr = [];
-	arr.push(randomNum(1, 23));
-	arr.push(randomNum(24, 33));
-	arr.push(randomNum(35, 43));
-	Logger.log(arr);
+	// Numeration begins from second row, NOT the first!!!!
+	arr.push(randomNum(2, 25));
+	arr.push(randomNum(26, 35));
+	arr.push(randomNum(36, 43));
 	return arr;
 }
 
@@ -68,7 +110,7 @@ function makeQuestionset() {
 }
 
 // Create unique form for one person
-function makeForm(studentEmail) {
+function makeForm(studentEmail, studentSheet) {
 	var dataset = makeQuestionset();
 	var formName = 'Экзамен' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
@@ -107,9 +149,10 @@ function makeForm(studentEmail) {
 
     PropertiesService.getScriptProperties().setProperty("tempId", formId);
 
-	// Записываем Id формы на лист Формы
+	// Записываем Id формы и группу на лист Формы
     var lineNumber = formSheet.getLastRow() + 1;
 	formSheet.getRange("A" + lineNumber).setValue(formId);
+	formSheet.getRange("C" + lineNumber).setValue(studentSheet.getName());
     return formId;
 }
 
@@ -128,6 +171,8 @@ function handleTheForm() {
 	var formResponses;
 	var grade = 0;
 	var gradeFinal;
+	var studentSheet;
+	var studentSheetName;
 	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
 		// Если найдена форма
 		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
@@ -139,6 +184,8 @@ function handleTheForm() {
 				// Если на форму есть ответы
 				if (formResponses.length > 0) {
 					formSheet.getRange("B" + (lineNumber)).setValue("*");
+					studentSheetName = formSheet.getRange("C" + (lineNumber)).getValue();
+					studentSheet = currentSpreadsheet.getSheetByName(studentSheetName);
 					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
 					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
 
@@ -157,7 +204,7 @@ function handleTheForm() {
 
 				  	gradeFinal = setGradeToTable(grade, lineNumberOfAnswer);
 
-				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_);
+				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_, studentSheet);
 				}
 			}	
 		} else {
@@ -258,17 +305,17 @@ function setGradeToTable(grade, lineNumberOfAnswer) {
 	return gradeFinal;
 }
 
-function makeFormForGroup() {
+function makeFormForGroup(studentSheet) {
 	var amountOfPeople = studentSheet.getLastRow() + 1;
 	var studentEmail;
 	var formId;
 	var cwId;
 	for (var i = 3; i < amountOfPeople; i++) {
 		studentEmail = studentSheet.getRange('A' + i).getValue();
-		var id = makeForm(studentEmail);
+		var id = makeForm(studentEmail, studentSheet);
 		// Запишем id формы на лист Студенты
 		studentSheet.getRange('B' + i).setValue(id);
-		cwId = createCW(id, studentEmail, i);
+		cwId = createCW(id, studentEmail, i, studentSheet);
 		studentSheet.getRange('E' + i).setValue(cwId);
 	}
 }
