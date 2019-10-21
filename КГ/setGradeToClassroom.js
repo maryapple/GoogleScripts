@@ -19,6 +19,36 @@ function createCW(id, studentEmail, i, studentSheet) {
 	return responseCourseWork.id;
 }
 
+/*function checkEmail(studentEmail) {
+	var studentId;
+	var listOfStudents;
+	var response;
+	var pageTokenSubs;
+	var listOfSubs;
+	
+	var pageTokenStudents = null;
+	do {
+		if (pageTokenStudents) {
+			response = Classroom.Courses.Students.list(courseId, {pageToken: pageTokenStudents});
+		} 
+		else {
+			response = Classroom.Courses.Students.list(courseId);
+		}
+		
+		listOfStudents = response.students;
+		pageTokenStudents = response.nextPageToken;
+		
+		for each(var student in listOfStudents) {
+			if (student.profile.emailAddress === studentEmail) {
+				studentId = student.profile.id;
+				pageTokenStudents = null;
+				return true;
+			}
+		}
+	} while(pageTokenStudents);
+	return false;
+}*/
+
 // Get the id of student
 function getSubId(studentEmail, cwId, i, studentSheet) {
 	Logger.log('studentEmail: ' + studentEmail);

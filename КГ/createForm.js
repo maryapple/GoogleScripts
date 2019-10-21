@@ -181,6 +181,7 @@ function handleTheForm() {
 				id_ = formSheet.getRange("A" + (lineNumber)).getValue();
 				form = FormApp.openById(id_);
 				formResponses = form.getResponses();
+				grade = 0;
 				// Если на форму есть ответы
 				if (formResponses.length > 0) {
 					formSheet.getRange("B" + (lineNumber)).setValue("*");
@@ -217,6 +218,7 @@ function handleTheForm() {
 function isResponseCorrect(resp) {
 	var quest = resp.getItem().getTitle();
 	quest = quest.slice(3);
+	var correct;
 	// Logger.log('The quest from FORM: ' + quest);
 	// Ищем на странице с пулом вопросом идентичный вопрос
 	for (var i = 2; i < 100; i++) {
@@ -228,7 +230,6 @@ function isResponseCorrect(resp) {
 				/*Logger.log('The correct resp: ' + correct);
 				Logger.log('The current resp: ' + resp.getResponse());*/
 				if (resp.getResponse() === correct) {
-					// Logger.log('response is correct 1');
 					return true;
 				}
 				else {
@@ -238,7 +239,8 @@ function isResponseCorrect(resp) {
 
 			else if (questionSheet.getRange('D' + i).getValue() === 'строка') {
 				// Logger.log('The correct: ' + questionSheet.getRange('E' + i).getValue().toString() + '\nThe current resp: ' + resp.getResponse().toString());
-				if (questionSheet.getRange('E' + i).getValue().toString() === resp.getResponse().toString()) {
+				correct = questionSheet.getRange('E' + i).getValue().toString();
+				if (correct === resp.getResponse().toString() || correct.toLowerCase() === resp.getResponse().toString()) {
 					return true;
 				}
 				else {
@@ -310,10 +312,10 @@ function makeFormForGroup(studentSheet) {
 	var studentEmail;
 	var formId;
 	var cwId;
+	var id;
 	for (var i = 3; i < amountOfPeople; i++) {
 		studentEmail = studentSheet.getRange('A' + i).getValue();
-		var id = makeForm(studentEmail, studentSheet);
-		// Запишем id формы на лист Студенты
+		id = makeForm(studentEmail, studentSheet);
 		studentSheet.getRange('B' + i).setValue(id);
 		cwId = createCW(id, studentEmail, i, studentSheet);
 		studentSheet.getRange('E' + i).setValue(cwId);
