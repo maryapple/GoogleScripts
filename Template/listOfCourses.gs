@@ -7,6 +7,6 @@ function getCourses() {
 //        nameOfCourse = arrayOfCourses[elem].name
 //        Logger.log(idOfCourse + nameOfCourse)
 //    }
-    Logger.log(arrayOfCourses)
+    // Logger.log(arrayOfCourses)
     return arrayOfCourses
 }

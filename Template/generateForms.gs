@@ -21,10 +21,11 @@ function onOpen(e) {
 	for(elem in arrayOfCourses) {
 		idOfCourse = arrayOfCourses[elem].id
 		nameOfCourse = arrayOfCourses[elem].name
-		obj.name = nameOfCourse
+		obj.name = nameOfCourse.toString()
 		obj.functionName = 'prepareSheet_'
 		menuItems.push(obj)
 	}
+	Logger.log(menuItems)
 /*	var menuItems = [
 		{name: 'Prepare sheet...', functionName: 'prepareSheet_'},
 		{name: 'Generate step-by-step...', functionName: 'generateStepByStep_'}
