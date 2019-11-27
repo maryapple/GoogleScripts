@@ -5,45 +5,43 @@ var formSheet = currentSpreadsheet.getSheetByName("Формы");
 var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
 var studentSheet;
 
+var arrayOfCourses = getCourses();
+
 function onOpen(e) {
 	var menu = SpreadsheetApp.getUi().createAddonMenu();
 	menu.addItem('Создать формы для группы', 'test');
 	menu.addToUi();
 
-	var spreadsheet = SpreadsheetApp.getActive()
-	var arrayOfCourses = getCourses()
-	var idOfCourse, nameOfCourse
-	var obj = {
-		name: 'Prepare sheet...', 
-		functionName: 'prepareSheet_'
-	}
+	var spreadsheet = SpreadsheetApp.getActive();
+	var idOfCourse, nameOfCourse;
+	
 	var menuItems = []
-	for(elem in arrayOfCourses) {
-		idOfCourse = arrayOfCourses[elem].id
-		nameOfCourse = arrayOfCourses[elem].name
-		obj.name = nameOfCourse.toString()
-		obj.functionName = 'prepareSheet_'
+	for (var n = 0; n < arrayOfCourses.length; n++) {
+		idOfCourse = arrayOfCourses[n].id
+		nameOfCourse = arrayOfCourses[n].name
+		var obj = {
+			name: nameOfCourse.toString(), 
+			functionName: 'course_' + arrayOfCourses[n].id
+		}
 		menuItems.push(obj)
 	}
-	Logger.log(menuItems)
-/*	var menuItems = [
-		{name: 'Prepare sheet...', functionName: 'prepareSheet_'},
-		{name: 'Generate step-by-step...', functionName: 'generateStepByStep_'}
-	];*/
+	// Logger.log(menuItems)
 	spreadsheet.addMenu('Выбрать дисциплину', menuItems);
 }
 
-//function onOpenAddCourses(e) {
-//	var menu = SpreadsheetApp.getUi().createAddonMenu()
-//    var obj = getCourses() 
-//    Logger.log(obj)
-//	menu.addItem('Выбрать дисциплину', 'test')
-//	menu.addToUi()
-//}
+var evalString = '';
+for (var n = 0; n < arrayOfCourses.length; n++) {
+	evalString += 'function course_' + arrayOfCourses[n].id + '() { test(' + arrayOfCourses[n].id + ') }';
+}
+eval(evalString);
 
-function test() {
+// СОЗДАЕТСЯ
+// function course_123() { test(123) }function course_234() { test(234) }function course_345() { test(345) }
+
+function test(id) {
+	Logger.log(id)
 	studentSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
-	makeFormForGroup(studentSheet);
+	studentSheet.getRange('F2').setValue(id)
 }
 
 function makeFormForGroup(studentSheet) {
@@ -60,27 +58,3 @@ function makeFormForGroup(studentSheet) {
 		studentSheet.getRange('E' + i).setValue(cwId);
 	}
 }
-
-/*function onOpen() {
-	var spreadsheet = SpreadsheetApp.getActive()
-	var arrayOfCourses = getCourses()
-	var idOfCourse, nameOfCourse
-	var obj = {
-		name: 'Prepare sheet...', 
-		functionName: 'prepareSheet_'
-	}
-	var menuItems = []
-	for(elem in arrayOfCourses) {
-		idOfCourse = arrayOfCourses[elem].id
-		nameOfCourse = arrayOfCourses[elem].name
-		obj.name = nameOfCourse
-		obj.functionName = 'prepareSheet_'
-		menuItems.push(obj)
-	}
-	// var menuItems = [
-	// 	{name: 'Prepare sheet...', functionName: 'prepareSheet_'},
-	// 	{name: 'Generate step-by-step...', functionName: 'generateStepByStep_'}
-	// ];
-	spreadsheet.addMenu('Выбрать дисциплину', menuItems);
-}
-*/
