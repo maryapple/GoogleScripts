@@ -55,7 +55,7 @@ function makeQuestionset() {
 // Create unique form for one person
 function makeForm(studentEmail, studentSheet) {
 	var dataset = makeQuestionset();
-	var formName = 'Экзамен' + ' - ' + studentEmail;
+	var formName = 'Тест' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
 	var formId = form.getId();
 
@@ -65,12 +65,12 @@ function makeForm(studentEmail, studentSheet) {
 		var parent = parents.next();
 		parent.removeFile(file);
 	}
-	DriveApp.getFolderById('1BVA2dEKB6xDf-WBo2gBI2HISNHw37KXW').addFile(file);
+	DriveApp.getFolderById('1dmCfYN5inqEsDf2ifgAACfMRto6bv62W').addFile(file);
 
     form.setLimitOneResponsePerUser(true);
     form.setRequireLogin(true);
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 5; i++) {
     	var item;
     	var imgId;
     	var arr = [];

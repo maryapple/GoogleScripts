@@ -1,3 +1,6 @@
+configSheet = currentSpreadsheet.getSheetByName("Config")
+var courseId = configSheet.getRange('A1').getValue()
+
 // Выставление оценки в таблицу
 function setGradeToTable(grade, lineNumberOfAnswer) {
 	var gradeFinal = 0;

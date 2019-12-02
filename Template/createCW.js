@@ -1,8 +1,11 @@
+configSheet = currentSpreadsheet.getSheetByName("Config")
+var courseId = configSheet.getRange('A1').getValue()
+
 function createCW(id, studentEmail, i, studentSheet) {
 	var existingForm = FormApp.openById(id);
 	var swId;
 	var courseWork = {
-		"title"		 : "Экзамен",
+		"title"		 : "Тест",
 		"materials"	 : { "link" : { "url" : existingForm.getPublishedUrl() } },
 		"state"		 : "PUBLISHED",
 		"maxPoints"	 : 10,

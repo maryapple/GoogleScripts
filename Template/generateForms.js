@@ -64,7 +64,7 @@ eval(evalString);
 
 // Запись id курса на конфигурационный лист
 function writeCurrentId(id) {
-	configSheet = currentSpreadsheet.getSheetByName("Config");
+	configSheet = currentSpreadsheet.getSheetByName("Config")
 	configSheet.getRange('A1').setValue(id)
 }
 
