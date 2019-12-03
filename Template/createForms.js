@@ -1,10 +1,28 @@
 // Generates array of random values
-function makeRandomNumbers() {
+function makeRandomNumbers(amountOfTasks) {
 	var arr = [];
-	// Numeration begins from second row, NOT the first
-	arr.push(randomNum(2, 10));
-	arr.push(randomNum(11, 19));
-	arr.push(randomNum(20, 25));
+	var amountOfQuestionsTable = questionSheet.getLastRow() - 1
+	var first = 0, last = 0, next = 0, i = 0;
+	var range = amountOfQuestionsTable / amountOfTasks
+	var flag
+	(amountOfQuestionsTable % amountOfTasks === 0) ? flag = true : flag = false
+	for (i = 1, next = 2; i <= amountOfTasks; i++ ) {
+		first = next
+		if (flag) {
+			last = i * range + 1
+		}
+		else {
+			if (i * range + range >= amountOfQuestionsTable) {
+				last = i * range + (amountOfQuestionsTable - i * range)
+			}
+			else { last = i * range + 1 }
+		}
+		
+		next = last + 1
+        arr.push(randomNum(first, last))
+	}
+
+	// Logger.log(arr)
 	return arr;
 }
 
@@ -39,8 +57,8 @@ function makeObject(index) {
 	return obj;
 }
 
-function makeQuestionset() {
-	var array = makeRandomNumbers();  // Array of 5 random values
+function makeQuestionset(amountOfTasks) {
+	var array = makeRandomNumbers(amountOfTasks);  // Array of random values
 	Logger.log(array)
 	var questionset = {}; // Object hat contains a line with question
 	var dataset = []; // Array of 5 questionets
@@ -48,7 +66,7 @@ function makeQuestionset() {
 	for (i in array) {
 		var ind = array[i];
 		questionset = makeObject(ind);
-		Logger.log(questionset)
+		// Logger.log(questionset)
 		dataset.push(questionset);
 	}
 	return dataset;
@@ -56,8 +74,9 @@ function makeQuestionset() {
 
 // Create unique form for one person
 function makeForm(studentEmail, studentSheet) {
-	var dataset = makeQuestionset();
-	Logger.log(dataset)
+	var configSheet = currentSpreadsheet.getSheetByName("Config")
+	var amountOfTasks = configSheet.getRange('B5').getValue()
+	var dataset = makeQuestionset(amountOfTasks);
 	var formName = 'Тест' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
     form.setLimitOneResponsePerUser(true);
@@ -74,9 +93,9 @@ function makeForm(studentEmail, studentSheet) {
 	DriveApp.getFolderById('1dmCfYN5inqEsDf2ifgAACfMRto6bv62W').addFile(file);
 
 	// Создание формы из вопросов
-    for (var i = 0; i < 3; i++) {
+	
+    for (var i = 0; i < amountOfTasks; i++) {
     	var item;
-    	Logger.log(dataset[i].type)
     	if (dataset[i].type == "много") {
 	    	item = form.addCheckboxItem();
 	    	item.setTitle(i + 1 + ". " + dataset[i].question);
