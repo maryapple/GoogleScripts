@@ -36,7 +36,8 @@ function makeObject(index) {
 	var qId = questionSheet.getRange('A' + index).getValue();
 	var question = questionSheet.getRange('B' + index).getValue();
 	var typeOfQuestion = questionSheet.getRange('D' + index).getValue();
-	
+	var hasImage = questionSheet.getRange('C' + index).getValue();
+
 	var answers = [];
 	var amountOfAnswers = questionSheet.getRange('F' + index).getValue();
 	for (var i = 0; i < amountOfAnswers; i++) {
@@ -49,6 +50,7 @@ function makeObject(index) {
 		id: qId,
 		question: question,
 		type: typeOfQuestion,
+		image: hasImage,
 		answers: answers,
 		amountOfAnswers: amountOfAnswers,
 		correctAnswer: correctAnswer
@@ -59,9 +61,9 @@ function makeObject(index) {
 
 function makeQuestionset(amountOfTasks) {
 	var array = makeRandomNumbers(amountOfTasks);  // Array of random values
-	Logger.log(array)
+	// Logger.log(array)
 	var questionset = {}; // Object hat contains a line with question
-	var dataset = []; // Array of 5 questionets
+	var dataset = []; // Array of questionets
 
 	for (i in array) {
 		var ind = array[i];
@@ -96,17 +98,36 @@ function makeForm(studentEmail, studentSheet) {
 	
     for (var i = 0; i < amountOfTasks; i++) {
     	var item;
+    	var imgId;
     	if (dataset[i].type == "много") {
+    		if (dataset[i].image != "") {
+    			imgId = getImageId(dataset[i]);
+    			var img = DriveApp.getFileById(imgId);
+    			form.addImageItem()
+    				.setImage(img);
+	    	}
 	    	item = form.addCheckboxItem();
 	    	item.setTitle(i + 1 + ". " + dataset[i].question);
 	    	item.setChoiceValues(dataset[i].answers);
 		}
     	else if (dataset[i].type == "один") {
+    		if (dataset[i].image != "") {
+    			imgId = getImageId(dataset[i]);
+    			var img = DriveApp.getFileById(imgId);
+    			form.addImageItem()
+    				.setImage(img);
+	    	}
 	    	item = form.addMultipleChoiceItem();
     		item.setTitle(i + 1 + ". " + dataset[i].question);
     		item.setChoiceValues(dataset[i].answers);
     	}
     	else if (dataset[i].type == "строка") {
+    		if (dataset[i].image != "") {
+    			imgId = getImageId(dataset[i]);
+    			var img = DriveApp.getFileById(imgId);
+    			form.addImageItem()
+    				.setImage(img);
+			}
 			form.addTextItem()
 	    		.setTitle(i + 1 + ". " + dataset[i].question);
     	}
@@ -119,4 +140,15 @@ function makeForm(studentEmail, studentSheet) {
 	formSheet.getRange("A" + lineNumber).setValue(formId);
 	formSheet.getRange("C" + lineNumber).setValue(studentSheet.getName());
     return formId;
+}
+
+function getImageId(obj) {
+	var idLink = obj.image;
+	if (idLink.slice(obj.image).indexOf("=") === -1) {
+		idLink = idLink.slice((obj.image).indexOf("/d/") + 3);
+	}
+	else {
+		idLink = idLink.slice((obj.image).indexOf("=") + 1);
+	}
+	return idLink;
 }
