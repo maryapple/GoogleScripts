@@ -12,6 +12,7 @@ function handleTheForm() {
 	var form;
 	var formResponses;
 	var grade;
+	var gradeIdeal;
 	var gradeFinal;
 	var studentSheet;
 	var studentSheetName;
@@ -24,6 +25,7 @@ function handleTheForm() {
 				form = FormApp.openById(id_);
 				formResponses = form.getResponses();
 				grade = 0;
+				gradeIdeal = 0
 				// Если на форму есть ответы
 				if (formResponses.length > 0) {
 					formSheet.getRange("B" + (lineNumber)).setValue("*");
@@ -41,11 +43,12 @@ function handleTheForm() {
 						if (isResponseCorrect(itemResponse) === true) {
 							grade++;
 						}
+						gradeIdeal ++
 					}
 					// Принимаем не более одного ответа
 				  	form.setAcceptingResponses(false);
 
-				  	gradeFinal = setGradeToTable(grade, lineNumberOfAnswer);
+				  	gradeFinal = setGradeToTable(grade, gradeIdeal, lineNumberOfAnswer);
 
 				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_, studentSheet);
 				}
