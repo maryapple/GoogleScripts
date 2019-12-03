@@ -2,9 +2,9 @@
 function makeRandomNumbers() {
 	var arr = [];
 	// Numeration begins from second row, NOT the first
-	arr.push(randomNum(2, 25));
-	arr.push(randomNum(26, 35));
-	arr.push(randomNum(36, 43));
+	arr.push(randomNum(2, 10));
+	arr.push(randomNum(11, 19));
+	arr.push(randomNum(20, 25));
 	return arr;
 }
 
@@ -41,12 +41,14 @@ function makeObject(index) {
 
 function makeQuestionset() {
 	var array = makeRandomNumbers();  // Array of 5 random values
+	Logger.log(array)
 	var questionset = {}; // Object hat contains a line with question
 	var dataset = []; // Array of 5 questionets
 
 	for (i in array) {
 		var ind = array[i];
 		questionset = makeObject(ind);
+		Logger.log(questionset)
 		dataset.push(questionset);
 	}
 	return dataset;
@@ -55,10 +57,14 @@ function makeQuestionset() {
 // Create unique form for one person
 function makeForm(studentEmail, studentSheet) {
 	var dataset = makeQuestionset();
+	Logger.log(dataset)
 	var formName = 'Тест' + ' - ' + studentEmail;
     var form = FormApp.create(formName);
+    form.setLimitOneResponsePerUser(true);
+    form.setRequireLogin(true);
 	var formId = form.getId();
 
+	// Запись формы в нужную папку
 	var file = DriveApp.getFileById(formId);
 	var parents = file.getParents();
 	while (parents.hasNext()) {
@@ -67,13 +73,10 @@ function makeForm(studentEmail, studentSheet) {
 	}
 	DriveApp.getFolderById('1dmCfYN5inqEsDf2ifgAACfMRto6bv62W').addFile(file);
 
-    form.setLimitOneResponsePerUser(true);
-    form.setRequireLogin(true);
-
-    for (var i = 0; i < 5; i++) {
+	// Создание формы из вопросов
+    for (var i = 0; i < 3; i++) {
     	var item;
-    	var imgId;
-    	var arr = [];
+    	Logger.log(dataset[i].type)
     	if (dataset[i].type == "много") {
 	    	item = form.addCheckboxItem();
 	    	item.setTitle(i + 1 + ". " + dataset[i].question);
