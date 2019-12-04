@@ -5,7 +5,13 @@ var formSheet = currentSpreadsheet.getSheetByName("Формы");
 var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
 var studentSheet;
 
-var arrayOfCourses = getCourses()
+// Если обработка ошибки идет внутри getCourses, то можно убрать try catch отсюда.
+try {
+	var arrayOfCourses = getCourses();
+} catch (e) {
+	var arrayOfCourses = [];
+	// Logger.log(e);
+}
 
 function getCourses() {
     var obj = Classroom.Courses.list();
@@ -15,6 +21,12 @@ function getCourses() {
 
 // Создание панели меню
 function onOpen(e) {
+	var menu = SpreadsheetApp.getUi().createAddonMenu();
+	menu.addItem('Инициализировать меню', 'initializeMenu');
+	menu.addToUi();
+}
+
+function initializeMenu() {
 	addGroupsToMenu()
 	addCoursesToMenu()
 }
@@ -88,8 +100,8 @@ function makeFormForGroup(studentSheet) {
 		// Запись id формы текущего студента в колонку B
 		studentSheet.getRange('B' + i).setValue(id);
 		Logger.log('next person')
-		/*// Создание и запись задания текущего студента
+		// Создание и запись задания текущего студента
 		cwId = createCW(id, studentEmail, i, studentSheet);
-		studentSheet.getRange('E' + i).setValue(cwId);*/
+		studentSheet.getRange('E' + i).setValue(cwId);
 	}
 }
