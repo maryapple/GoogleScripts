@@ -2,59 +2,67 @@ function createTimeDrivenTriggers() {
 	ScriptApp.newTrigger('handleTheForm')
 				.timeBased()
 				.everyMinutes(1)
-				.create();
+				.create()
 }
 
 function handleTheForm() {
 	// lineNumber -номер строки, в которой форма еще не проверена, но пройдена учеником
-	var lineNumber;
-	var id_;
-	var form;
-	var formResponses;
-	var grade;
-	var gradeIdeal;
-	var gradeFinal;
-	var studentSheet;
-	var studentSheetName;
+	var lineNumber
+	var id_
+	var form
+	var formResponses
+	var grade
+	var gradeIdeal
+	var gradeFinal
+	var studentSheet
+	var studentSheetName
 	for (lineNumber = 2; lineNumber < 2000; lineNumber++) {
 		// Если найдена форма
 		if (formSheet.getRange("A" + lineNumber).getValue() !== "") {
 			// Если Форма еще не обработана
 			if (formSheet.getRange("B" + lineNumber).getValue() === "") {
-				id_ = formSheet.getRange("A" + (lineNumber)).getValue();
-				form = FormApp.openById(id_);
-				formResponses = form.getResponses();
-				grade = 0;
+				id_ = formSheet.getRange("A" + (lineNumber)).getValue()
+				form = FormApp.openById(id_)
+				formResponses = form.getResponses()
+				grade = 0
 				gradeIdeal = 0
 				// Если на форму есть ответы
 				if (formResponses.length > 0) {
-					formSheet.getRange("B" + (lineNumber)).setValue("*");
-					studentSheetName = formSheet.getRange("C" + (lineNumber)).getValue();
-					studentSheet = currentSpreadsheet.getSheetByName(studentSheetName);
-					var formResponse = formResponses[formResponses.length - 1]; // Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
-					var itemResponses = formResponse.getItemResponses(); // Массив ответов из formResponse
+					formSheet.getRange("B" + (lineNumber)).setValue("*")
+					studentSheetName = formSheet.getRange("C" + (lineNumber)).getValue()
+					studentSheet = currentSpreadsheet.getSheetByName(studentSheetName)
+					// Проход по массиву formResponses. formResponse - текущий массив ответов от одного человека
+					var formResponse = formResponses[formResponses.length - 1]
+					// Массив ответов из formResponse
+					var itemResponses = formResponse.getItemResponses()
 
 					// Находим пустую строку на листе Ответы для записи ответов
-					var lineNumberOfAnswer = answerSheet.getLastRow() + 1;
-					answerSheet.getRange(String.fromCharCode(65) + lineNumberOfAnswer).setValue(id_);
+					var lineNumberOfAnswer = answerSheet.getLastRow() + 1
+					answerSheet.getRange(String.fromCharCode(65) + lineNumberOfAnswer).setValue(id_)
 					for (var j = 0; j < itemResponses.length; j++) {
-						var itemResponse = itemResponses[j];
-						answerSheet.getRange(String.fromCharCode(65 + j + 1) + lineNumberOfAnswer).setValue(itemResponse.getResponse().toString());
-						if (isResponseCorrect(itemResponse) === true) {
-							grade++;
+						var itemResponse = itemResponses[j]
+						if ( 67 + j + 1 <= 90) {
+							answerSheet
+								.getRange(String.fromCharCode(67 + j + 1) + lineNumberOfAnswer)
+								.setValue(itemResponse.getResponse().toString())
 						}
-						gradeIdeal ++
+						
+						if (isResponseCorrect(itemResponse) === true) {
+							grade++
+						}
+						gradeIdeal++
 					}
 					// Принимаем не более одного ответа
-				  	form.setAcceptingResponses(false);
+				  	form.setAcceptingResponses(false)
 
-				  	gradeFinal = setGradeToTable(grade, gradeIdeal, lineNumberOfAnswer);
+				  	gradeFinal = setGradeToTable(grade, gradeIdeal, lineNumberOfAnswer)
 
-				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_, studentSheet);
+				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_, studentSheet)
 				}
-			}	
-		} else {
-			break;
+			}
+		}
+		else {
+			break
 		}
 	}
 }

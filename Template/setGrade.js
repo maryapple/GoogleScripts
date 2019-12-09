@@ -4,8 +4,8 @@ var courseId = configSheet.getRange('A1').getValue()
 // Выставление оценки в таблицу
 function setGradeToTable(grade, gradeIdeal, lineNumberOfAnswer) {
 	var gradeFinal = Math.ceil((grade/gradeIdeal) * 10)
-	answerSheet.getRange("G" + lineNumberOfAnswer).setValue(gradeFinal * 10);
-	answerSheet.getRange("H" + lineNumberOfAnswer).setValue(gradeFinal);
+	answerSheet.getRange("B" + lineNumberOfAnswer).setValue(gradeFinal * 10);
+	answerSheet.getRange("C" + lineNumberOfAnswer).setValue(gradeFinal);
 	return gradeFinal;
 }
 

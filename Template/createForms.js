@@ -61,7 +61,7 @@ function makeObject(index) {
 
 function makeQuestionset(amountOfTasks) {
 	var array = makeRandomNumbers(amountOfTasks);  // Array of random values
-	// Logger.log(array)
+	Logger.log(array)
 	var questionset = {}; // Object hat contains a line with question
 	var dataset = []; // Array of questionets
 
