@@ -38,20 +38,28 @@ function handleTheForm() {
 
 					// Находим пустую строку на листе Ответы для записи ответов
 					var lineNumberOfAnswer = answerSheet.getLastRow() + 1
-					answerSheet.getRange(lineNumberOfAnswer, 1).setValue(id_)
+					answerSheet.getRange(lineNumberOfAnswer, 2).setValue(id_)
+
+					for (var i = 3; i <= studentSheet.getLastRow(); i++) {
+						if (id_.toString() === studentSheet.getRange(i, 2).getValue().toString()) {
+							var studentEmail = studentSheet.getRange(i, 1).getValue()
+							answerSheet.getRange(lineNumberOfAnswer, 1).setValue(studentEmail)
+						}
+					}
+					
 					for (var j = 0; j < itemResponses.length; j++) {
 						var itemResponse = itemResponses[j]
 						answerSheet
-							.getRange(lineNumberOfAnswer, 4 + j)
+							.getRange(lineNumberOfAnswer, 5 + j)
 							.setValue(itemResponse.getResponse().toString())
 						Logger.log(itemResponse.getItem().getTitle())
 						if (isResponseCorrect(itemResponse) === true) {
 							grade++
-							answerSheet.getRange(lineNumberOfAnswer, 4 + j).setBackground('green')
+							answerSheet.getRange(lineNumberOfAnswer, 5 + j).setBackground('green')
 							Logger.log("grade" + grade)
 						}
 						else {
-							answerSheet.getRange(lineNumberOfAnswer, 4 + j).setBackground('red')
+							answerSheet.getRange(lineNumberOfAnswer, 5 + j).setBackground('red')
 						}
 						gradeIdeal++
 					}
