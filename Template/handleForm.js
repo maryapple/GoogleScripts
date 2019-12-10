@@ -56,7 +56,6 @@ function handleTheForm() {
 						if (isResponseCorrect(itemResponse) === true) {
 							grade++
 							answerSheet.getRange(lineNumberOfAnswer, 5 + j).setBackground('green')
-							Logger.log("grade" + grade)
 						}
 						else {
 							answerSheet.getRange(lineNumberOfAnswer, 5 + j).setBackground('red')
@@ -66,10 +65,9 @@ function handleTheForm() {
 
 					// Принимаем не более одного ответа
 				  	form.setAcceptingResponses(false)
-				  	Logger.log('GRADE: ' + grade + ' of ' + gradeIdeal)
 				  	gradeFinal = setGradeToTable(grade, gradeIdeal, lineNumberOfAnswer)
 
-				  	// setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_, studentSheet)
+				  	setGradeToClassroom(gradeFinal, lineNumberOfAnswer, id_, studentSheet)
 				}
 			}
 		}
@@ -93,7 +91,6 @@ function isResponseCorrect(resp) {
 					var num = questionSheet.getRange('E' + i).getValue();
 					correct = questionSheet.getRange(String.fromCharCode(70 + num) + i).getValue().toString()
 					if (resp.getResponse() === correct) {
-						Logger.log('single, correct')
 						return true;
 					}
 					return false;
@@ -101,7 +98,6 @@ function isResponseCorrect(resp) {
 				case 'строка':
 					correct = questionSheet.getRange('E' + i).getValue().toString();
 					if (correct === resp.getResponse().toString() || correct.toLowerCase() === resp.getResponse().toString()) {
-						Logger.log('str, correct')
 						return true;
 					}
 					return false
@@ -128,7 +124,6 @@ function isResponseCorrect(resp) {
 					}
 
 					if (cnt === answers.length) {
-						Logger.log('multiple, true')
 						return true;
 					}
 					return false
