@@ -47,7 +47,11 @@ function handleTheForm() {
 						Logger.log(itemResponse.getItem().getTitle())
 						if (isResponseCorrect(itemResponse) === true) {
 							grade++
+							answerSheet.getRange(lineNumberOfAnswer, 4 + j).setBackground('green')
 							Logger.log("grade" + grade)
+						}
+						else {
+							answerSheet.getRange(lineNumberOfAnswer, 4 + j).setBackground('red')
 						}
 						gradeIdeal++
 					}
@@ -73,7 +77,7 @@ function isResponseCorrect(resp) {
 	quest = quest.slice(quest.indexOf('. ') + 2);
 	var correct;
 	var amountOfQuestionsInTable = questionSheet.getLastRow()
-	for (var i = 2; i < amountOfQuestionsInTable; i++) {
+	for (var i = 2; i <= amountOfQuestionsInTable; i++) {
 		if (questionSheet.getRange('B' + i).getValue() === quest) {
 			var typeOfQuestion = questionSheet.getRange('D' + i).getValue()
 			switch (typeOfQuestion) {
