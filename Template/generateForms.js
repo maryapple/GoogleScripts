@@ -99,7 +99,6 @@ function makeFormForGroup(studentSheet) {
 		id = makeForm(studentEmail, studentSheet);
 		// Запись id формы текущего студента в колонку B
 		studentSheet.getRange('B' + i).setValue(id);
-		Logger.log('next person')
 		// Создание и запись задания текущего студента
 		cwId = createCW(id, studentEmail, i, studentSheet);
 		studentSheet.getRange('E' + i).setValue(cwId);

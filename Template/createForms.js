@@ -1,29 +1,39 @@
 // Generates array of random values
-function makeRandomNumbers(amountOfTasks) {
-	var arr = [];
-	var amountOfQuestionsTable = questionSheet.getLastRow() - 1
-	var first = 0, last = 0, next = 0, i = 0;
-	var range = amountOfQuestionsTable / amountOfTasks
-	var flag
-	(amountOfQuestionsTable % amountOfTasks === 0) ? flag = true : flag = false
-	for (i = 1, next = 2; i <= amountOfTasks; i++ ) {
-		first = next
-		if (flag) {
-			last = i * range + 1
-		}
-		else {
-			if (i * range + range >= amountOfQuestionsTable) {
-				last = i * range + (amountOfQuestionsTable - i * range)
-			}
-			else { last = i * range + 1 }
-		}
+// function makeRandomNumbers(amountOfTasks) {
+// 	var arr = [];
+// 	var amountOfQuestionsTable = questionSheet.getLastRow() - 1
+// 	var first = 0, last = 0, next = 0, i = 0;
+// 	var range = amountOfQuestionsTable / amountOfTasks
+// 	var flag
+// 	(amountOfQuestionsTable % amountOfTasks === 0) ? flag = true : flag = false
+// 	for (i = 1, next = 2; i <= amountOfTasks; i++ ) {
+// 		first = next
+// 		if (flag) {
+// 			last = i * range + 1
+// 		}
+// 		else {
+// 			if (i * range + range >= amountOfQuestionsTable) {
+// 				last = i * range + (amountOfQuestionsTable - i * range)
+// 			}
+// 			else { last = i * range + 1 }
+// 		}
 		
-		next = last + 1
-        arr.push(randomNum(first, last))
-	}
+// 		next = last + 1
+//         arr.push(randomNum(first, last))
+// 	}
+// 	return arr;
+// }
 
-	// Logger.log(arr)
-	return arr;
+function generateRandomArray(amountOfTasks) {
+	var arr = []
+	for (var i = 0; i <= amountOfTasks; i++) {
+		var num = randomNum(2, questionSheet.getLastRow())
+		while (arr.indexOf(num) !== -1) {
+			num = randomNum(2, questionSheet.getLastRow())
+		}
+		arr.push(num)
+	}
+	return arr
 }
 
 // Generates a number between min, max
@@ -60,7 +70,7 @@ function makeObject(index) {
 }
 
 function makeQuestionset(amountOfTasks) {
-	var array = makeRandomNumbers(amountOfTasks);  // Array of random values
+	var array = generateRandomArray(amountOfTasks);  // Array of random values
 	Logger.log(array)
 	var questionset = {}; // Object hat contains a line with question
 	var dataset = []; // Array of questionets
