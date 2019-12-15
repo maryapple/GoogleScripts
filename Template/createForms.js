@@ -102,7 +102,12 @@ function makeForm(studentEmail, studentSheet) {
 		var parent = parents.next();
 		parent.removeFile(file);
 	}
-	DriveApp.getFolderById('1dmCfYN5inqEsDf2ifgAACfMRto6bv62W').addFile(file);
+
+	var folderLink = configSheet.getRange("B4").getValue()
+	folderLink = folderLink.slice(folderLink.indexOf('id') + 3)
+	Logger.log(folderLink)
+	DriveApp.getFolderById(folderLink).addFile(file)
+	// DriveApp.getFolderById('1dmCfYN5inqEsDf2ifgAACfMRto6bv62W').addFile(file);
 
 	// Создание формы из вопросов
 	
