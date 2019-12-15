@@ -93,6 +93,7 @@ function makeFormForGroup(studentSheet) {
 	var formId;
 	var cwId;
 	var id;
+	createTimeDrivenTriggers()
 	for (var i = 3; i < amountOfPeople; i++) {
 		// Генерация формы для текущего студента
 		studentEmail = studentSheet.getRange('A' + i).getValue();
