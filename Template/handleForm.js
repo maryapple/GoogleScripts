@@ -3,6 +3,10 @@ function createTimeDrivenTriggers() {
 				.timeBased()
 				.everyMinutes(1)
 				.create()
+	ScriptApp.newTrigger('deleteTriggerHandle')
+		.timeBased()
+		.after(1000 * 60 * 60 * 24)
+		.create()
 }
 
 function handleTheForm() {
@@ -131,5 +135,13 @@ function isResponseCorrect(resp) {
 			}
 			break;
 		}
+	}
+}
+
+function deleteTriggerHandle() {
+	var triggers = ScriptApp.getProjectTriggers();
+
+	for (var i = 0; i < triggers.length; i++) {
+		ScriptApp.deleteTrigger(triggers[i]);
 	}
 }

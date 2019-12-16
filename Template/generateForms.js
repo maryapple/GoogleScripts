@@ -93,15 +93,55 @@ function makeFormForGroup(studentSheet) {
 	var formId;
 	var cwId;
 	var id;
+	var flag = false
+	var arrayOfEmails = getArrayOfEmails()
 	createTimeDrivenTriggers()
 	for (var i = 3; i < amountOfPeople; i++) {
+		
 		// Генерация формы для текущего студента
 		studentEmail = studentSheet.getRange('A' + i).getValue();
-		id = makeForm(studentEmail, studentSheet);
-		// Запись id формы текущего студента в колонку B
-		studentSheet.getRange('B' + i).setValue(id);
-		// Создание и запись задания текущего студента
-		cwId = createCW(id, studentEmail, i, studentSheet);
-		studentSheet.getRange('E' + i).setValue(cwId);
+		flag = checkstudentEmail(studentEmail, arrayOfEmails)
+		if (flag) {
+			id = makeForm(studentEmail, studentSheet);
+			// Запись id формы текущего студента в колонку B
+			studentSheet.getRange('B' + i).setValue(id);
+			// Создание и запись задания текущего студента
+			cwId = createCW(id, studentEmail, i, studentSheet);
+			studentSheet.getRange('E' + i).setValue(cwId);
+		}
+		
 	}
+}
+
+function getArrayOfEmails() {
+	var courseId = configSheet.getRange(1, 1).getValue();
+	var arrayOfEmails = [];
+
+	var pageTokenStudents = null;
+	do {
+		if (pageTokenStudents) {
+			response = Classroom.Courses.Students.list(courseId, { pageToken: pageTokenStudents });
+		}
+		else {
+			response = Classroom.Courses.Students.list(courseId);
+		}
+
+		listOfStudents = response.students;
+		pageTokenStudents = response.nextPageToken;
+
+		for each(var student in listOfStudents) {
+			arrayOfEmails.push(student.profile.emailAddress)
+		}
+	} while (pageTokenStudents);
+
+	return arrayOfEmails
+}
+
+function checkstudentEmail(studentEmail, arrayOfEmails) {
+	for (var i = 0; i < arrayOfEmails.length; i++) {
+		if (arrayOfEmails[i] === studentEmail) {
+			return true
+		}
+	}
+	return false
 }
