@@ -23,3 +23,9 @@
 // 	}
 // 	return arr;
 // }
+
+function getLink() {
+    var folderLink = configSheet.getRange("B4").getValue()
+	folderLink = folderLink.slice(folderLink.indexOf('id') + 3)
+	Logger.log(folderLink)
+}

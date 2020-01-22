@@ -14,7 +14,7 @@ try {
 }
 
 function getCourses() {
-    var obj = Classroom.Courses.list();
+    var obj = Classroom.Courses.list({'teacherId': 'me'});
     var arrayOfCourses = obj.courses
     return arrayOfCourses
 }
