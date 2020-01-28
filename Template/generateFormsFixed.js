@@ -4,7 +4,6 @@ var answerSheet = currentSpreadsheet.getSheetByName("Ответы");
 var formSheet = currentSpreadsheet.getSheetByName("Формы");
 var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST");
 var studentSheet;
-var testSheet = currentSpreadsheet.getSheetByName('Test')
 
 // Если обработка ошибки идет внутри getCourses, то можно убрать try catch отсюда.
 try {
@@ -49,20 +48,21 @@ function addCoursesToMenu() {
 	var idOfCourse, nameOfCourse
 	var menuItems = [];
 	for (var n = 0; n < arrayOfCourses.length; n++) {
-		testSheet.getRange(4 + n, 1).setValue(n)
 		idOfCourse = arrayOfCourses[n].id
 		nameOfCourse = arrayOfCourses[n].name.toString()
-		// ВСЕ РАВНО НЕ ДОБАВЛЯЕТСЯ СПИСОК
-		if (nameOfCourse !== ('2020 Сетевые видеотехнологии')) {
-			var obj = {
-				name: nameOfCourse, 
-				functionName: 'course_' + arrayOfCourses[n].id
+
+		for (var i = 0; i < menuItems.length; i++) {
+			if (nameOfCourse === menuItems[i].name) {
+				nameOfCourse += ' (Дубль)';
+				i = 0;
 			}
-			menuItems.push(obj)
-            testSheet.getRange(4 + n, 2).setValue(obj.name)
-		    testSheet.getRange(4 + n, 3).setValue(obj.functionName)
 		}
-		
+
+		var obj = {
+			name: nameOfCourse, 
+			functionName: 'course_' + arrayOfCourses[n].id
+		}
+		menuItems.push(obj)
 	}
 	// Logger.log(menuItems)
 	spreadsheet.addMenu('Выбрать дисциплину', menuItems);
