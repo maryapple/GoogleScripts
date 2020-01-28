@@ -3,7 +3,6 @@ var questionSheet = currentSpreadsheet.getSheetByName("Вопросы")
 var answerSheet = currentSpreadsheet.getSheetByName("Ответы")
 var formSheet = currentSpreadsheet.getSheetByName("Формы")
 var studentTESTSheet = currentSpreadsheet.getSheetByName("СтудентыTEST")
-var typesSheet = currentSpreadsheet.getSheetByName("Types")
 var studentSheet
 
 // Если обработка ошибки идет внутри getCourses, то можно убрать try catch отсюда
