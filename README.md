@@ -49,15 +49,15 @@
 - Папку Диска, в которую сохранять формы
 
 Так же требуется предоставить следующие разрешения:
-https://www.googleapis.com/auth/classroom.courses
-https://www.googleapis.com/auth/classroom.coursework.students
-https://www.googleapis.com/auth/classroom.profile.emails
-https://www.googleapis.com/auth/classroom.profile.photos
-https://www.googleapis.com/auth/classroom.rosters
-https://www.googleapis.com/auth/drive
-https://www.googleapis.com/auth/forms
-https://www.googleapis.com/auth/script.scriptapp
-https://www.googleapis.com/auth/spreadsheets
+- https://www.googleapis.com/auth/classroom.courses
+- https://www.googleapis.com/auth/classroom.coursework.students
+- https://www.googleapis.com/auth/classroom.profile.emails
+- https://www.googleapis.com/auth/classroom.profile.photos
+- https://www.googleapis.com/auth/classroom.rosters
+- https://www.googleapis.com/auth/drive
+- https://www.googleapis.com/auth/forms
+- https://www.googleapis.com/auth/script.scriptapp
+- https://www.googleapis.com/auth/spreadsheets
 
 ### Google Classroom
 Пользователь, который планирует проводить тесты, должен создать курс в Classroom и пригласить студентов в роли учащихся на данный курс.
